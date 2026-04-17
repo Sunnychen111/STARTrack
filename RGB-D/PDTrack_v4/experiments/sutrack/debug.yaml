@@ -1,0 +1,119 @@
+DATA:
+  MAX_SAMPLE_INTERVAL: 400
+  MULTI_MODAL_LANGUAGE: False
+  MULTI_MODAL_VISION: False
+  MEAN:
+  - 0.485
+  - 0.456
+  - 0.406
+  SEARCH:
+    CENTER_JITTER: 3.5
+    FACTOR: 4.0
+    SCALE_JITTER: 0.5
+    SIZE: 384
+    NUMBER: 1
+  STD:
+  - 0.229
+  - 0.224
+  - 0.225
+  TEMPLATE:
+    CENTER_JITTER: 0
+    FACTOR: 2.0
+    SCALE_JITTER: 0
+    SIZE: 192
+    NUMBER: 2
+  TRAIN:
+    # --- [Debug 修改 1] 只使用你目前有深度图的数据集 ---
+    DATASETS_NAME:
+    - GOT10K_vottrain
+    
+    DATASETS_RATIO:
+    - 1
+    
+    # --- [Debug 修改 2] 极小的采样数，确保几分钟跑完一轮 ---
+    SAMPLE_PER_EPOCH: 2000
+
+  USE_NLP:
+    TNL2K: True
+
+MODEL:
+  ENCODER:
+    TYPE: fastitpnb
+    STRIDE: 16
+    # 确保这个路径指向你的 FastITPN Base 权重
+    PRETRAIN_TYPE: 'pretrained/itpn/fast_itpn_base_clipl_e1600.pt' 
+    PATCHEMBED_INIT: halfcopy
+    DROP_PATH: 0.1
+    TOKEN_TYPE_INDICATE: True
+  
+  # --- [核心] Mamba 配置 ---
+  MAMBA:
+    ENABLE: True        # 开启 Mamba 融合
+    DEPTH: 2            # 融合层数
+    DIM: 512            # 必须匹配 fastitpnb (Base) 的 embed_dim 512
+    DROP_PATH: 0.1
+    
+  TEXT_ENCODER:
+    TYPE: ViT-L/14
+  DECODER:
+    TYPE: CENTER
+    NUM_CHANNELS: 256
+    CONV_TYPE: normal
+    XAVIER_INIT: True
+  TASK_DECODER:
+    NUM_CHANNELS: 256
+    FEATURE_TYPE: average
+  TASK_NUM: 5
+  TASK_INDEX:
+    GOT10K: 0  # Debug 时主要关注这个
+    # 其他为了兼容性保留
+    VASTTRACK: 0
+    LASOT: 0
+    TRACKINGNET: 0
+    COCO: 0
+    TNL2K: 1
+    DEPTHTRACK: 2
+    LASHER: 3
+    VISEVENT: 4
+
+TRAIN:
+  TYPE: text_frozen
+  ENCODER_MULTIPLIER: 0.1
+  # --- [Debug 修改 3] 显存安全值 ---
+  BATCH_SIZE: 1
+  # --- [Debug 修改 4] 快速测试轮数 ---
+  EPOCH: 5
+  GRAD_CLIP_NORM: 0.1
+  LR: 0.0001
+  LR_DROP_EPOCH: 4 # 让它在第4轮衰减一下试试
+  # --- [Debug 修改 5] Windows/Debug 设小一点 ---
+  NUM_WORKER: 2
+  OPTIMIZER: ADAMW
+  PRINT_INTERVAL: 10 # 打印频繁一点
+  SCHEDULER:
+    TYPE: step
+    DECAY_RATE: 0.1
+  WEIGHT_DECAY: 0.0001
+
+TEST:
+  EPOCH: 180
+  SEARCH_FACTOR: 4.0
+  SEARCH_SIZE: 384
+  TEMPLATE_FACTOR: 2.0
+  TEMPLATE_SIZE: 192
+  WINDOW: True
+  NUM_TEMPLATES: 2
+  UPDATE_INTERVALS:
+    DEFAULT: 25
+  UPDATE_THRESHOLD:
+    DEFAULT: 0.70
+  UPDATE_DEPTH_VAR_MIN: 0.0001
+  UPDATE_DEPTH_VAR_MAX: 500.0
+  UPDATE_SEMANTIC_TH: 0.7
+  MULTI_MODAL_VISION:
+    DEFAULT: True
+  MULTI_MODAL_LANGUAGE:
+    DEFAULT: True
+  USE_NLP:
+    DEFAULT: False
+    TNL2K: True
