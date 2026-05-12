@@ -1,0 +1,38 @@
+DATA:
+  FEATURE_DIR: /home/cps/czl/SUTrack/offline_features_sutrack_b384
+  HARD_LIST: hard_train_list.txt
+  HARD_FEATURE_ROOT: /home/cps/czl/SUTrack/offline_features_sutrack_b384
+  FULL_FEATURE_DIRS:
+    - /home/cps/czl/SUTrack/offline_features_sutrack_b384/lasot
+    - /home/cps/czl/SUTrack/offline_features_sutrack_b384/got10k
+  HARD_POOL_RATIO: 0.7
+  FULL_POOL_RATIO: 0.3
+  HARD_PROB: 0.9           # 90%概率强制采样包含困难帧的片段
+  FULL_HARD_PROB: 0.2
+  EXCLUDE_HARD_FROM_FULL: true
+  DISABLE_CACHE: false     # 🔴 正式训练必须设为 false，开启 pkl 缓存实现秒启动
+
+TRAIN:
+  EPOCHS: 40
+  SNIPPET_LEN: 32          # 序列长度，必须和 Mamba HISTORY_LEN 保持一致
+  SAMPLES_PER_EPOCH: 5000  # 如果发现收敛太快，可以加大到 8000 或 10000
+  LR: 0.00001              # Mamba 的学习率 (1e-5 很安全)
+  WEIGHT_DECAY: 0.0001
+  RANK_LAMBDA: 0.02
+  MARGIN: 0.2
+  BATCH_SIZE: 1            # 我们代码里是以 list 传入 history，保持 1 即可
+  NUM_WORKERS: 8           # 🔴 正式训练必须大于 0（建议 8），否则数据加载会卡死显卡
+  SAVE_EVERY: 5
+  PRINT_EVERY: 50
+
+TARGET:
+  TARGET_SOURCE: iou       # 使用你最新提取的 topk_ious
+  LOSS_MODE: hard          # 将最高 IoU 视为唯一硬标签 (Target=1, 其他=0)
+  IOU_THRESH: 0.3          # 门控阈值：Top1 IoU 小于 0.3 的垃圾帧直接丢弃
+
+MODEL:
+  HISTORY_LEN: 32          # 记忆库容量
+  USE_MAMBA_HISTORY: true
+  HISTORY_MODE: differentiable # 🔴 核心：允许 Mamba 时序参数反向传播
+  MAMBA_D_STATE: 16
+  MAMBA_EXPAND: 2
