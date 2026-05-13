@@ -35,12 +35,9 @@ class MambaHistoryBank(nn.Module):
 
     def _zero_init_output_projection(self):
         out_proj = getattr(self.mamba, "out_proj", None)
-
         if out_proj is None:
             return
-
         nn.init.zeros_(out_proj.weight)
-
         if out_proj.bias is not None:
             nn.init.zeros_(out_proj.bias)
 
@@ -66,17 +63,14 @@ class MambaHistoryBank(nn.Module):
             raise ValueError(
                 f"history_tokens must be [B, T, C], got {tuple(history_tokens.shape)}"
             )
-
         if history_tokens.size(-1) != self.feat_dim:
             raise ValueError(
                 f"history_tokens channel mismatch, expected {self.feat_dim}, "
                 f"got {history_tokens.size(-1)}"
             )
-
         if self.use_mamba:
             fused = history_tokens + self.mamba(self.norm(history_tokens))
             return fused[:, -1, :]
-
         return history_tokens.mean(dim=1)
 
     @torch.no_grad()
@@ -85,7 +79,6 @@ class MambaHistoryBank(nn.Module):
             raise ValueError(
                 f"target_feat must be [B, C], got {tuple(target_feat.shape)}"
             )
-
         if target_feat.size(-1) != self.feat_dim:
             raise ValueError(
                 f"target_feat channel mismatch, expected {self.feat_dim}, "
@@ -94,7 +87,6 @@ class MambaHistoryBank(nn.Module):
 
         bsz = target_feat.size(0)
         self._ensure_state_batch(bsz)
-
         token = target_feat.detach().unsqueeze(1)
 
         if self.cached_tokens is None:
@@ -107,7 +99,6 @@ class MambaHistoryBank(nn.Module):
 
         self.cached_tokens = seq.detach()
         self.cached_history = self.encode_sequence(seq).detach()
-
         return self.cached_history
 
 
@@ -115,10 +106,9 @@ def topk_peaks_nms(score_map, topk=8, kernel_size=5):
     """
     Extract Top-K local peaks from score_map.
 
-    Important fix:
-        Non-peak positions are filled with -1e9, not 0.
-        Otherwise, if score_map contains negative or very small values,
-        non-peaks may be incorrectly selected by topk().
+    Important fix: Non-peak positions are filled with -1e9, not 0.
+    Otherwise, if score_map contains negative or very small values,
+    non-peaks may be incorrectly selected by topk().
     """
     if score_map.dim() != 4 or score_map.size(1) != 1:
         raise ValueError(
@@ -127,7 +117,6 @@ def topk_peaks_nms(score_map, topk=8, kernel_size=5):
 
     bsz, _, h, w = score_map.shape
     k = min(int(topk), h * w)
-
     pad = int(kernel_size) // 2
 
     local_max = F.max_pool2d(
@@ -136,10 +125,7 @@ def topk_peaks_nms(score_map, topk=8, kernel_size=5):
         stride=1,
         padding=pad,
     )
-
     peak_mask = score_map.eq(local_max)
-
-    # Critical fix: never use zeros for non-peak positions.
     peak_map = score_map.masked_fill(~peak_mask, -1e9)
 
     peak_scores, peak_indices = torch.topk(
@@ -149,12 +135,9 @@ def topk_peaks_nms(score_map, topk=8, kernel_size=5):
         largest=True,
         sorted=True,
     )
-
     peak_y = torch.div(peak_indices, w, rounding_mode="floor")
     peak_x = peak_indices % w
-
     peaks_xy = torch.stack([peak_x, peak_y], dim=-1)
-
     return peaks_xy, peak_scores
 
 
@@ -169,7 +152,6 @@ def sample_feature_at_peaks(feat_map, peaks_xy=None, peak_x=None, peak_y=None):
         peak_y = peaks_xy[..., 1]
 
     bsz, channels, height, width = feat_map.shape
-
     peak_x = peak_x.to(device=feat_map.device, dtype=feat_map.dtype)
     peak_y = peak_y.to(device=feat_map.device, dtype=feat_map.dtype)
 
@@ -184,7 +166,6 @@ def sample_feature_at_peaks(feat_map, peaks_xy=None, peak_x=None, peak_y=None):
         norm_y = torch.zeros_like(peak_y)
 
     grid = torch.stack([norm_x, norm_y], dim=-1).unsqueeze(1)
-
     sampled = F.grid_sample(
         feat_map,
         grid,
@@ -192,7 +173,6 @@ def sample_feature_at_peaks(feat_map, peaks_xy=None, peak_x=None, peak_y=None):
         padding_mode="border",
         align_corners=True,
     )
-
     return sampled.squeeze(2).transpose(1, 2).contiguous()
 
 
@@ -224,17 +204,23 @@ class PostDecoderDisambiguator(nn.Module):
         update_ratio_thresh=0.90,
         target_prob_thresh=0.50,
         min_id_margin=0.00,
+        # Inference-only heuristic reliability gate.
+        # It adds no trainable parameters and does not require retraining.
+        use_heuristic_reliability=True,
+        reliability_update_thresh=0.55,
+        rel_target_weight=0.25,
+        rel_score_weight=0.20,
+        rel_anchor_weight=0.25,
+        rel_history_weight=0.15,
+        rel_margin_weight=0.10,
+        rel_ambiguity_weight=0.05,
         eps=1e-6,
     ):
         super().__init__()
-
         self.feat_dim = int(feat_dim)
         self.template_feat_dim = (
-            int(template_feat_dim)
-            if template_feat_dim is not None
-            else self.feat_dim
+            int(template_feat_dim) if template_feat_dim is not None else self.feat_dim
         )
-
         self.ratio_thresh = float(ratio_thresh)
         self.topk_peaks = int(topk_peaks)
         self.nms_kernel_size = int(nms_kernel_size)
@@ -245,18 +231,25 @@ class PostDecoderDisambiguator(nn.Module):
         self.use_template_anchor = bool(use_template_anchor)
         self.use_first_frame_anchor = bool(use_first_frame_anchor)
         self.use_mamba_history_bank = bool(use_mamba_history_bank)
-
         self.template_anchor_weight = float(template_anchor_weight)
         self.first_frame_anchor_weight = float(first_frame_anchor_weight)
         self.mamba_history_weight = float(mamba_history_weight)
-
         self.use_history_aware_rerank_score = bool(use_history_aware_rerank_score)
 
         self.update_ratio_thresh = float(update_ratio_thresh)
         self.target_prob_thresh = float(target_prob_thresh)
         self.min_id_margin = float(min_id_margin)
-        self.eps = float(eps)
 
+        self.use_heuristic_reliability = bool(use_heuristic_reliability)
+        self.reliability_update_thresh = float(reliability_update_thresh)
+        self.rel_target_weight = float(rel_target_weight)
+        self.rel_score_weight = float(rel_score_weight)
+        self.rel_anchor_weight = float(rel_anchor_weight)
+        self.rel_history_weight = float(rel_history_weight)
+        self.rel_margin_weight = float(rel_margin_weight)
+        self.rel_ambiguity_weight = float(rel_ambiguity_weight)
+
+        self.eps = float(eps)
         self.template_anchor = None
         self.first_frame_anchor = None
 
@@ -276,6 +269,7 @@ class PostDecoderDisambiguator(nn.Module):
         else:
             self.template_proj = nn.Identity()
 
+        # Keep this unchanged so that old checkpoints can still be loaded.
         self.reranker_mlp = nn.Sequential(
             nn.LayerNorm(7),
             nn.Linear(7, 32),
@@ -301,10 +295,8 @@ class PostDecoderDisambiguator(nn.Module):
     def update_history(self, target_feat):
         if not self.use_mamba_history_bank:
             return None
-
         if target_feat.dim() == 3:
             target_feat = target_feat[:, 0, :]
-
         return self.history_bank.update(target_feat.detach())
 
     @torch.no_grad()
@@ -317,10 +309,8 @@ class PostDecoderDisambiguator(nn.Module):
     ):
         if reset_dynamic:
             self.history_bank.reset_state(batch_size or 1)
-
         if template_anchor is not None and self.use_template_anchor:
             self.set_template_anchor(template_anchor)
-
         if first_frame_anchor is not None and self.use_first_frame_anchor:
             self.set_first_frame_anchor(first_frame_anchor)
 
@@ -328,7 +318,6 @@ class PostDecoderDisambiguator(nn.Module):
     def set_template_anchor(self, target_feat):
         if target_feat is None:
             return
-
         target_feat = self._anchor_tensor(target_feat)
         self.template_anchor = target_feat.detach()
 
@@ -336,38 +325,28 @@ class PostDecoderDisambiguator(nn.Module):
     def set_first_frame_anchor(self, target_feat):
         if target_feat is None:
             return
-
         self.first_frame_anchor = self._anchor_tensor(target_feat).detach()
 
     def _anchor_tensor(self, anchor):
         device = next(self.parameters()).device
         dtype = next(self.parameters()).dtype
-
         anchor = anchor.to(device=device, dtype=dtype)
-
         if anchor.dim() == 3:
             anchor = anchor.mean(dim=1)
-
         if anchor.size(-1) != self.feat_dim:
             anchor = self.template_proj(anchor)
-
         return anchor
 
     def _validate_anchor_tensor(self, anchor, batch_size, feat_dim, device, dtype):
         if anchor is None:
             return None
-
         anchor = anchor.to(device=device, dtype=dtype)
-
         if anchor.dim() == 3:
             anchor = anchor[:, -1, :]
-
         if anchor.size(-1) != feat_dim:
             anchor = self.template_proj(anchor)
-
         if anchor.size(0) == 1 and batch_size > 1:
             anchor = anchor.expand(batch_size, feat_dim)
-
         return anchor
 
     def _cosine_peaks_to_anchor(self, peak_feats, anchor):
@@ -378,26 +357,12 @@ class PostDecoderDisambiguator(nn.Module):
                 device=peak_feats.device,
                 dtype=peak_feats.dtype,
             )
-
-        peak_norm = F.normalize(
-            peak_feats,
-            p=2,
-            dim=-1,
-            eps=self.eps,
-        )
-
-        anchor_norm = F.normalize(
-            anchor,
-            p=2,
-            dim=-1,
-            eps=self.eps,
-        )
-
+        peak_norm = F.normalize(peak_feats, p=2, dim=-1, eps=self.eps)
+        anchor_norm = F.normalize(anchor, p=2, dim=-1, eps=self.eps)
         return (peak_norm * anchor_norm[:, None, :]).sum(dim=-1)
 
     def _history_for_topk(self, topk_feats, history_tokens=None):
         bsz, _, feat_dim = topk_feats.shape
-
         template_anchor = None
         first_frame_anchor = None
         dynamic_history = None
@@ -405,13 +370,10 @@ class PostDecoderDisambiguator(nn.Module):
         if history_tokens is not None:
             if history_tokens.size(-1) != self.feat_dim:
                 history_tokens = self.template_proj(history_tokens)
-
             if self.use_template_anchor:
                 template_anchor = history_tokens.mean(dim=1)
-
             if self.use_mamba_history_bank:
                 dynamic_history = self.history_bank.encode_sequence(history_tokens)
-
         elif self.use_mamba_history_bank:
             dynamic_history = self.history_bank.get_history()
 
@@ -423,7 +385,6 @@ class PostDecoderDisambiguator(nn.Module):
                 topk_feats.device,
                 topk_feats.dtype,
             )
-
         if self.use_first_frame_anchor:
             first_frame_anchor = self._validate_anchor_tensor(
                 self.first_frame_anchor,
@@ -432,7 +393,6 @@ class PostDecoderDisambiguator(nn.Module):
                 topk_feats.device,
                 topk_feats.dtype,
             )
-
         dynamic_history = self._validate_anchor_tensor(
             dynamic_history,
             bsz,
@@ -440,7 +400,6 @@ class PostDecoderDisambiguator(nn.Module):
             topk_feats.device,
             topk_feats.dtype,
         )
-
         return template_anchor, first_frame_anchor, dynamic_history
 
     def _prepare_robust_scores(self, raw_scores):
@@ -450,16 +409,12 @@ class PostDecoderDisambiguator(nn.Module):
             posinf=20.0,
             neginf=-20.0,
         ).clamp(-20.0, 20.0)
-
         score_mean = scores.mean(dim=-1, keepdim=True)
         score_std = scores.std(dim=-1, keepdim=True, unbiased=False).clamp_min(1e-4)
-
         score_z = ((scores - score_mean) / score_std).clamp(-5.0, 5.0)
-
         score_prob = torch.softmax(score_z, dim=-1)
 
         top1_prob = score_prob[:, 0].clamp_min(1e-4)
-
         if score_prob.size(1) > 1:
             top2_prob = score_prob[:, 1]
         else:
@@ -467,18 +422,115 @@ class PostDecoderDisambiguator(nn.Module):
 
         score_ratio = (score_prob / top1_prob[:, None]).clamp(0.0, 5.0)
         ambiguity_ratio = (top2_prob / top1_prob).clamp(0.0, 5.0)
-
         score_gap = (score_z[:, :1] - score_z).clamp(-5.0, 5.0)
-
         return score_z, score_gap, score_prob, score_ratio, ambiguity_ratio
+
+    @staticmethod
+    def _gather_selected_1d(values, selected_idx):
+        """
+        values: [B, K]
+        selected_idx: [B]
+        return: [B]
+        """
+        if values is None:
+            return None
+        return values.gather(1, selected_idx.view(-1, 1)).squeeze(1)
+
+    @staticmethod
+    def _normalize_cosine_to_conf(sim):
+        """Convert cosine similarity from [-1, 1] to [0, 1]."""
+        if sim is None:
+            return None
+        return ((sim + 1.0) * 0.5).clamp(0.0, 1.0)
+
+    def _compute_heuristic_reliability(
+        self,
+        selected_idx,
+        selected_prob,
+        identity_margin,
+        ambiguity_ratio,
+        score_prob,
+        sim_first=None,
+        sim_dynamic=None,
+        sim_history=None,
+    ):
+        """
+        Inference-only reliability gate for MemoryBank update.
+
+        It estimates whether the selected candidate is safe enough to be written
+        into the dynamic history bank. This does not change the selected bbox.
+        """
+        selected_score_prob = self._gather_selected_1d(score_prob, selected_idx)
+        if selected_score_prob is None:
+            selected_score_prob = torch.zeros_like(selected_prob)
+
+        selected_sim_first = self._gather_selected_1d(sim_first, selected_idx)
+        selected_sim_dynamic = self._gather_selected_1d(sim_dynamic, selected_idx)
+        selected_sim_history = self._gather_selected_1d(sim_history, selected_idx)
+
+        anchor_conf = self._normalize_cosine_to_conf(selected_sim_first)
+        dynamic_conf = self._normalize_cosine_to_conf(selected_sim_dynamic)
+        history_conf = self._normalize_cosine_to_conf(selected_sim_history)
+
+        if anchor_conf is None:
+            anchor_conf = history_conf if history_conf is not None else torch.zeros_like(selected_prob)
+        if dynamic_conf is None:
+            dynamic_conf = history_conf if history_conf is not None else torch.zeros_like(selected_prob)
+
+        margin_conf = identity_margin.clamp(0.0, 1.0)
+        ambiguity_conf = (1.0 - ambiguity_ratio).clamp(0.0, 1.0)
+
+        weights = {
+            "target": self.rel_target_weight,
+            "score": self.rel_score_weight,
+            "anchor": self.rel_anchor_weight,
+            "history": self.rel_history_weight,
+            "margin": self.rel_margin_weight,
+            "ambiguity": self.rel_ambiguity_weight,
+        }
+        weight_sum = max(float(sum(weights.values())), self.eps)
+
+        reliability = (
+            weights["target"] * selected_prob.clamp(0.0, 1.0)
+            + weights["score"] * selected_score_prob.clamp(0.0, 1.0)
+            + weights["anchor"] * anchor_conf
+            + weights["history"] * dynamic_conf
+            + weights["margin"] * margin_conf
+            + weights["ambiguity"] * ambiguity_conf
+        ) / weight_sum
+
+        reliability = torch.nan_to_num(
+            reliability,
+            nan=0.0,
+            posinf=1.0,
+            neginf=0.0,
+        ).clamp(0.0, 1.0)
+
+        aux = {
+            "reliability_score": reliability.detach(),
+            "selected_score_prob": selected_score_prob.detach(),
+            "selected_sim_first": (
+                selected_sim_first.detach()
+                if selected_sim_first is not None
+                else torch.zeros_like(selected_prob).detach()
+            ),
+            "selected_sim_dynamic": (
+                selected_sim_dynamic.detach()
+                if selected_sim_dynamic is not None
+                else torch.zeros_like(selected_prob).detach()
+            ),
+            "selected_sim_history": (
+                selected_sim_history.detach()
+                if selected_sim_history is not None
+                else torch.zeros_like(selected_prob).detach()
+            ),
+            "ambiguity_conf": ambiguity_conf.detach(),
+        }
+        return reliability, aux
 
     def forward_topk(self, topk_feats, topk_scores, history_tokens=None, return_aux=False):
         bsz, num_peaks, _ = topk_feats.shape
-
-        topk_scores = topk_scores.to(
-            device=topk_feats.device,
-            dtype=topk_feats.dtype,
-        )
+        topk_scores = topk_scores.to(device=topk_feats.device, dtype=topk_feats.dtype)
 
         score_z, score_gap, score_prob, score_ratio, ambiguity_ratio = (
             self._prepare_robust_scores(topk_scores)
@@ -497,11 +549,9 @@ class PostDecoderDisambiguator(nn.Module):
         # First-frame anchor is given higher weight than dynamic history.
         active_sims = []
         active_weights = []
-
         if first_frame_anchor is not None:
             active_sims.append(sim_first)
             active_weights.append(self.first_frame_anchor_weight)
-
         if dynamic_history is not None:
             active_sims.append(sim_dynamic)
             active_weights.append(self.mamba_history_weight)
@@ -533,7 +583,6 @@ class PostDecoderDisambiguator(nn.Module):
             ],
             dim=-1,
         )
-
         rerank_features = torch.nan_to_num(
             rerank_features,
             nan=0.0,
@@ -542,7 +591,6 @@ class PostDecoderDisambiguator(nn.Module):
         ).clamp(-5.0, 5.0)
 
         target_logits = self.reranker_mlp(rerank_features).squeeze(-1)
-
         if not return_aux:
             return target_logits
 
@@ -568,60 +616,39 @@ class PostDecoderDisambiguator(nn.Module):
         """
         Build sparse Top-K score map.
 
-        This map is used only when selected_idx != 0.
-        If selected_idx == 0, original score_map is returned unchanged.
+        This map is used only when selected_idx != 0. If selected_idx == 0,
+        original score_map is returned unchanged.
         """
         refined_score_map = score_map.new_zeros(score_map.shape)
-
         candidate_scores = target_probs.clamp(0.0, 1.0)
-
         flat_map = refined_score_map.flatten(2)
-
-        flat_idx = (
-            peaks_xy[..., 1] * width + peaks_xy[..., 0]
-        ).long().unsqueeze(1)
-
-        flat_map.scatter_(
-            2,
-            flat_idx,
-            candidate_scores.unsqueeze(1),
-        )
-
+        flat_idx = (peaks_xy[..., 1] * width + peaks_xy[..., 0]).long().unsqueeze(1)
+        flat_map.scatter_(2, flat_idx, candidate_scores.unsqueeze(1))
         return refined_score_map
 
     def forward(self, score_map, feat_map, history_tokens=None, prev_center=None):
         """
         Post-decoder disambiguation.
 
-        Critical inference rule:
-            If selected_idx == 0, return the original score_map unchanged.
-            Only when selected_idx != 0 do we replace the score_map.
-
-        This prevents STARTrack from changing thousands of normal frames
-        when the reranker still selects the baseline Top-1 candidate.
+        Critical inference rule: If selected_idx == 0, return the original
+        score_map unchanged. Only when selected_idx != 0 do we replace the
+        score_map. This prevents STARTrack from changing thousands of normal
+        frames when the reranker still selects the baseline Top-1 candidate.
         """
         if score_map.dim() != 4 or score_map.size(1) != 1:
             raise ValueError(
                 f"score_map must be [B, 1, H, W], got {tuple(score_map.shape)}"
             )
-
         if feat_map.dim() != 4:
-            raise ValueError(
-                f"feat_map must be [B, C, H, W], got {tuple(feat_map.shape)}"
-            )
+            raise ValueError(f"feat_map must be [B, C, H, W], got {tuple(feat_map.shape)}")
 
         bsz, _, height, width = feat_map.shape
-
         peaks_xy, peak_scores = topk_peaks_nms(
             score_map,
             topk=self.topk_peaks,
             kernel_size=self.nms_kernel_size,
         )
-
-        peak_feats = sample_feature_at_peaks(
-            feat_map,
-            peaks_xy=peaks_xy,
-        )
+        peak_feats = sample_feature_at_peaks(feat_map, peaks_xy=peaks_xy)
 
         target_logits, topk_aux = self.forward_topk(
             peak_feats,
@@ -629,55 +656,62 @@ class PostDecoderDisambiguator(nn.Module):
             history_tokens=history_tokens,
             return_aux=True,
         )
-
         target_probs = torch.softmax(target_logits, dim=-1)
-
         selected_prob, selected_idx = target_probs.max(dim=-1)
 
-        sorted_probs, _ = torch.sort(
-            target_probs,
-            dim=-1,
-            descending=True,
-        )
-
+        sorted_probs, _ = torch.sort(target_probs, dim=-1, descending=True)
         if sorted_probs.size(1) > 1:
             second_prob = sorted_probs[:, 1]
         else:
             second_prob = torch.zeros_like(selected_prob)
-
         identity_margin = selected_prob - second_prob
 
-        batch_idx = torch.arange(
-            bsz,
-            device=score_map.device,
-        )
-
+        batch_idx = torch.arange(bsz, device=score_map.device)
         selected_xy = peaks_xy[batch_idx, selected_idx]
-
-        target_feat = peak_feats[
-            batch_idx,
-            selected_idx,
-            :
-        ].detach()
+        target_feat = peak_feats[batch_idx, selected_idx, :].detach()
 
         score_z, score_gap, score_prob, score_ratio, ambiguity_ratio = (
             self._prepare_robust_scores(peak_scores)
         )
-
-        effective_peak_count = (
-            score_ratio > self.multi_peak_ratio_thresh
-        ).sum(dim=-1)
-
+        effective_peak_count = (score_ratio > self.multi_peak_ratio_thresh).sum(dim=-1)
         rerank_used = selected_idx != 0
 
-        should_update = (
+        base_should_update = (
             (selected_prob >= self.target_prob_thresh)
             & (identity_margin >= self.min_id_margin)
             & (ambiguity_ratio <= self.update_ratio_thresh)
             & (selected_idx >= 0)
         )
 
-        # Build sparse reranked map.
+        if self.use_heuristic_reliability:
+            reliability_score, reliability_aux = self._compute_heuristic_reliability(
+                selected_idx=selected_idx,
+                selected_prob=selected_prob,
+                identity_margin=identity_margin,
+                ambiguity_ratio=ambiguity_ratio,
+                score_prob=score_prob,
+                sim_first=topk_aux.get("sim_first", None),
+                sim_dynamic=topk_aux.get("sim_dynamic", None),
+                sim_history=topk_aux.get("sim_history", None),
+            )
+            should_update = base_should_update & (
+                reliability_score >= self.reliability_update_thresh
+            )
+        else:
+            reliability_score = selected_prob.detach()
+            selected_score_prob = self._gather_selected_1d(score_prob, selected_idx)
+            if selected_score_prob is None:
+                selected_score_prob = torch.zeros_like(selected_prob)
+            reliability_aux = {
+                "reliability_score": reliability_score.detach(),
+                "selected_score_prob": selected_score_prob.detach(),
+                "selected_sim_first": torch.zeros_like(selected_prob).detach(),
+                "selected_sim_dynamic": torch.zeros_like(selected_prob).detach(),
+                "selected_sim_history": torch.zeros_like(selected_prob).detach(),
+                "ambiguity_conf": (1.0 - ambiguity_ratio).clamp(0.0, 1.0).detach(),
+            }
+            should_update = base_should_update
+
         reranked_score_map = self._build_sparse_rerank_score_map(
             score_map=score_map,
             peaks_xy=peaks_xy,
@@ -686,13 +720,9 @@ class PostDecoderDisambiguator(nn.Module):
             width=width,
         )
 
-        # ------------------------------------------------------------
-        # Critical conservative gate:
-        #   selected_idx == 0 -> return original SUTrack score_map.
-        #   selected_idx != 0 -> use reranked sparse score_map.
-        #
-        # This should make bbox_changed_frames close to rerank_used_frames.
-        # ------------------------------------------------------------
+        # Conservative gate:
+        # selected_idx == 0 -> return original SUTrack score_map.
+        # selected_idx != 0 -> use sparse reranked score_map.
         if bsz == 1:
             if bool(rerank_used.detach().reshape(-1)[0].item()):
                 refined_score_map = reranked_score_map
@@ -713,6 +743,7 @@ class PostDecoderDisambiguator(nn.Module):
             "identity_margin": identity_margin.detach(),
             "ambiguity_ratio": ambiguity_ratio.detach(),
             "should_update": should_update.detach(),
+            "base_should_update": base_should_update.detach(),
             "rerank_used": rerank_used.detach(),
             "peaks_xy": peaks_xy.detach(),
             "selected_xy": selected_xy.detach(),
@@ -722,11 +753,10 @@ class PostDecoderDisambiguator(nn.Module):
             "score_prob": score_prob.detach(),
             "effective_peak_count": effective_peak_count.detach(),
             "is_ambiguous": (
-                (ambiguity_ratio >= self.ratio_thresh)
-                | (effective_peak_count >= 3)
+                (ambiguity_ratio >= self.ratio_thresh) | (effective_peak_count >= 3)
             ).detach(),
+            "reliability_score": reliability_score.detach(),
         }
-
         aux_info.update(topk_aux)
-
+        aux_info.update(reliability_aux)
         return refined_score_map, aux_info

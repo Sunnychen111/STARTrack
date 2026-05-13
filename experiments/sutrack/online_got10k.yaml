@@ -64,6 +64,17 @@ training:
   max_motion_norm: 4.0
   max_scale_ratio: 4.0
 
+  # Inference-only reliability gate for predicted Stage4 state/history updates.
+  # Teacher-forced history is not blocked by this gate.
+  use_heuristic_reliability_gate: true
+  reliability_update_thresh: 0.50
+  rel_target_weight: 0.25
+  rel_score_weight: 0.20
+  rel_margin_weight: 0.15
+  rel_ambiguity_weight: 0.15
+  rel_motion_weight: 0.10
+  rel_history_weight: 0.15
+
 
 loss:
   iou_thresh: 0.3

@@ -58,8 +58,12 @@ class SUTRACK(BaseTracker):
     def _load_base_checkpoint(self, network, state_dict):
         if self.use_startrack and isinstance(state_dict, dict):
             state_dict = {
-                k: v for k, v in state_dict.items()
-                if not (k.startswith("post_disambiguator.") or k.startswith("module.post_disambiguator."))
+                k: v
+                for k, v in state_dict.items()
+                if not (
+                    k.startswith("post_disambiguator.")
+                    or k.startswith("module.post_disambiguator.")
+                )
             }
         try:
             network.load_state_dict(state_dict, strict=True)
@@ -67,8 +71,11 @@ class SUTRACK(BaseTracker):
         except RuntimeError:
             if not self.use_startrack:
                 raise
+
         missing_keys, unexpected_keys = network.load_state_dict(state_dict, strict=False)
-        non_startrack_missing = [k for k in missing_keys if not k.startswith("post_disambiguator.")]
+        non_startrack_missing = [
+            k for k in missing_keys if not k.startswith("post_disambiguator.")
+        ]
         if non_startrack_missing:
             raise RuntimeError(
                 "Base checkpoint is missing non-STARTrack keys: "
@@ -115,11 +122,23 @@ class SUTRACK(BaseTracker):
             use_template_anchor=False,
             use_first_frame_anchor=True,
             use_history_aware_rerank_score=False,
-
             # 第一帧权重大于动态历史
             first_frame_anchor_weight=float(self._cfg_value("STARTRACK_FIRST_FRAME_ANCHOR_WEIGHT", 0.50)),
             mamba_history_weight=float(self._cfg_value("STARTRACK_MAMBA_HISTORY_WEIGHT", 0.30)),
             template_anchor_weight=float(self._cfg_value("STARTRACK_TEMPLATE_ANCHOR_WEIGHT", 0.20)),
+            # Inference-only heuristic reliability gate. No retraining required.
+            use_heuristic_reliability=bool(
+                self._cfg_value("STARTRACK_USE_HEURISTIC_RELIABILITY", True)
+            ),
+            reliability_update_thresh=float(
+                self._cfg_value("STARTRACK_RELIABILITY_UPDATE_THRESH", 0.55)
+            ),
+            rel_target_weight=float(self._cfg_value("STARTRACK_REL_TARGET_WEIGHT", 0.25)),
+            rel_score_weight=float(self._cfg_value("STARTRACK_REL_SCORE_WEIGHT", 0.20)),
+            rel_anchor_weight=float(self._cfg_value("STARTRACK_REL_ANCHOR_WEIGHT", 0.25)),
+            rel_history_weight=float(self._cfg_value("STARTRACK_REL_HISTORY_WEIGHT", 0.15)),
+            rel_margin_weight=float(self._cfg_value("STARTRACK_REL_MARGIN_WEIGHT", 0.10)),
+            rel_ambiguity_weight=float(self._cfg_value("STARTRACK_REL_AMBIGUITY_WEIGHT", 0.05)),
         )
 
     def _setup_startrack(self):
@@ -138,18 +157,25 @@ class SUTRACK(BaseTracker):
         ckpt_path = os.path.expanduser(ckpt_path)
         checkpoint = torch.load(ckpt_path, map_location="cpu", weights_only=False)
         state = checkpoint["model"] if isinstance(checkpoint, dict) and "model" in checkpoint else checkpoint
+
         if isinstance(state, dict):
             if any(k.startswith("post_disambiguator.") for k in state.keys()):
-                state = {k[len("post_disambiguator."):]: v for k, v in state.items()
-                         if k.startswith("post_disambiguator.")}
+                state = {
+                    k[len("post_disambiguator."):]: v
+                    for k, v in state.items()
+                    if k.startswith("post_disambiguator.")
+                }
             elif any(k.startswith("module.post_disambiguator.") for k in state.keys()):
                 prefix = "module.post_disambiguator."
-                state = {k[len(prefix):]: v for k, v in state.items() if k.startswith(prefix)}
+                state = {
+                    k[len(prefix):]: v
+                    for k, v in state.items()
+                    if k.startswith(prefix)
+                }
 
         missing, unexpected = self.network.post_disambiguator.load_state_dict(state, strict=False)
         print("[STARTrack] checkpoint loaded:", ckpt_path)
         print(f"[STARTrack] missing keys: {len(missing)}, unexpected keys: {len(unexpected)}")
-
         self.network.post_disambiguator.eval()
         for p in self.network.post_disambiguator.parameters():
             p.requires_grad_(False)
@@ -157,9 +183,26 @@ class SUTRACK(BaseTracker):
         self.startrack_update_ratio_thresh = float(self._cfg_value("STARTRACK_UPDATE_RATIO_THRESH", 0.90))
         self.startrack_target_prob_thresh = float(self._cfg_value("STARTRACK_TARGET_PROB_THRESH", 0.50))
         self.startrack_min_id_margin = float(self._cfg_value("STARTRACK_MIN_ID_MARGIN", 0.00))
-        self.network.post_disambiguator.update_ratio_thresh = self.startrack_update_ratio_thresh
-        self.network.post_disambiguator.target_prob_thresh = self.startrack_target_prob_thresh
-        self.network.post_disambiguator.min_id_margin = self.startrack_min_id_margin
+
+        post = self.network.post_disambiguator
+        post.update_ratio_thresh = self.startrack_update_ratio_thresh
+        post.target_prob_thresh = self.startrack_target_prob_thresh
+        post.min_id_margin = self.startrack_min_id_margin
+
+        # Heuristic reliability gate for MemoryBank update.
+        # These attributes are not checkpoint parameters, so this is safe after load_state_dict().
+        post.use_heuristic_reliability = bool(
+            self._cfg_value("STARTRACK_USE_HEURISTIC_RELIABILITY", True)
+        )
+        post.reliability_update_thresh = float(
+            self._cfg_value("STARTRACK_RELIABILITY_UPDATE_THRESH", 0.55)
+        )
+        post.rel_target_weight = float(self._cfg_value("STARTRACK_REL_TARGET_WEIGHT", 0.25))
+        post.rel_score_weight = float(self._cfg_value("STARTRACK_REL_SCORE_WEIGHT", 0.20))
+        post.rel_anchor_weight = float(self._cfg_value("STARTRACK_REL_ANCHOR_WEIGHT", 0.25))
+        post.rel_history_weight = float(self._cfg_value("STARTRACK_REL_HISTORY_WEIGHT", 0.15))
+        post.rel_margin_weight = float(self._cfg_value("STARTRACK_REL_MARGIN_WEIGHT", 0.10))
+        post.rel_ambiguity_weight = float(self._cfg_value("STARTRACK_REL_AMBIGUITY_WEIGHT", 0.05))
 
     def _reset_startrack_memory(self):
         if not self.use_startrack or getattr(self.network, "post_disambiguator", None) is None:
@@ -203,6 +246,7 @@ class SUTRACK(BaseTracker):
                 and self._aux_float(aux_info, "identity_margin", 0.0) >= self.startrack_min_id_margin
                 and self._aux_float(aux_info, "ambiguity_ratio", 1.0) <= self.startrack_update_ratio_thresh
             )
+
         if not should_update:
             return False
 
@@ -228,8 +272,12 @@ class SUTRACK(BaseTracker):
         if num_search > 1:
             search_tokens = search_tokens.view(tokens.size(0), num_search, self.network.num_patch_x, tokens.size(-1))
             search_tokens = search_tokens[:, -1, :, :]
+
         return search_tokens.transpose(1, 2).contiguous().view(
-            tokens.size(0), tokens.size(-1), self.network.fx_sz, self.network.fx_sz
+            tokens.size(0),
+            tokens.size(-1),
+            self.network.fx_sz,
+            self.network.fx_sz,
         )
 
     def _apply_startrack_rerank(self, out_dict, enc_opt=None, prev_center=None):
@@ -237,9 +285,11 @@ class SUTRACK(BaseTracker):
             return out_dict
         if "startrack_aux" in out_dict:
             return out_dict
+
         f_map = self._get_startrack_fmap(out_dict, enc_opt)
         if f_map is None:
             return out_dict
+
         with torch.no_grad():
             refined_score_map, aux_info = self.network.post_disambiguator(
                 score_map=out_dict["score_map"],
@@ -247,17 +297,16 @@ class SUTRACK(BaseTracker):
                 history_tokens=None,
                 prev_center=prev_center,
             )
+
         out_dict["score_map_raw"] = out_dict["score_map"]
         out_dict["score_map"] = refined_score_map
         out_dict["f_map"] = f_map
-
         out_dict["startrack_aux"] = aux_info
         return out_dict
-    
+
     def _init_startrack_first_frame_anchor(self, image, init_bbox):
         if not self.use_startrack or getattr(self.network, "post_disambiguator", None) is None:
             return
-
         post = self.network.post_disambiguator
         if not getattr(post, "use_first_frame_anchor", False):
             return
@@ -268,9 +317,7 @@ class SUTRACK(BaseTracker):
             self.params.search_factor,
             output_sz=self.params.search_size,
         )
-
         search = self.preprocessor.process(x_patch_arr)
-
         if self.multi_modal_vision and search.size(1) == 3:
             search = torch.cat((search, search), dim=1)
 
@@ -282,7 +329,6 @@ class SUTRACK(BaseTracker):
                 self.text_src,
                 self.task_index_batch,
             )
-
             f_map = self._get_startrack_fmap({}, enc_opt)
             if f_map is None:
                 return
@@ -298,36 +344,34 @@ class SUTRACK(BaseTracker):
                 ),
                 normalize=True,
             )
-
             cx = (init_box_crop[0] + 0.5 * init_box_crop[2]) * (f_map.size(-1) - 1)
             cy = (init_box_crop[1] + 0.5 * init_box_crop[3]) * (f_map.size(-2) - 1)
-
             first_xy = torch.stack([cx, cy], dim=0).view(1, 1, 2)
-
-            first_feat = sample_feature_at_peaks(
-                f_map,
-                peaks_xy=first_xy,
-            ).squeeze(1)
+            first_feat = sample_feature_at_peaks(f_map, peaks_xy=first_xy).squeeze(1)
 
             post.initialize_memory(
                 first_frame_anchor=first_feat,
                 batch_size=1,
                 reset_dynamic=True,
             )
-
             if bool(self._cfg_value("STARTRACK_SEED_HISTORY_WITH_FIRST_FRAME", True)):
                 post.update_history(first_feat)
 
-        if getattr(self.network, "encoder_postprocess", None) is not None:
-            self.network.encoder_postprocess.reset_online_state(
-                batch_size=search.size(0),
-                device=search.device,
-                dtype=search.dtype,
-            )
+            if getattr(self.network, "encoder_postprocess", None) is not None:
+                self.network.encoder_postprocess.reset_online_state(
+                    batch_size=search.size(0),
+                    device=search.device,
+                    dtype=search.dtype,
+                )
 
     def _prev_center_in_search_feature(self, resize_factor, feat_w, feat_h, device, dtype):
         if self.state is None or resize_factor <= 0:
-            return torch.tensor([[0.5 * (feat_w - 1), 0.5 * (feat_h - 1)]], device=device, dtype=dtype)
+            return torch.tensor(
+                [[0.5 * (feat_w - 1), 0.5 * (feat_h - 1)]],
+                device=device,
+                dtype=dtype,
+            )
+
         cx_prev = float(self.state[0]) + 0.5 * float(self.state[2])
         cy_prev = float(self.state[1]) + 0.5 * float(self.state[3])
         crop_side = float(self.params.search_size) / float(resize_factor)
@@ -336,17 +380,29 @@ class SUTRACK(BaseTracker):
         cx_crop = (cx_prev - crop_x0) * float(resize_factor)
         cy_crop = (cy_prev - crop_y0) * float(resize_factor)
         scale = float(max(int(self.params.search_size) - 1, 1))
-        cx_feat = np.clip(cx_crop / scale * float(max(int(feat_w) - 1, 0)), 0.0, float(max(int(feat_w) - 1, 0)))
-        cy_feat = np.clip(cy_crop / scale * float(max(int(feat_h) - 1, 0)), 0.0, float(max(int(feat_h) - 1, 0)))
+        cx_feat = np.clip(
+            cx_crop / scale * float(max(int(feat_w) - 1, 0)),
+            0.0,
+            float(max(int(feat_w) - 1, 0)),
+        )
+        cy_feat = np.clip(
+            cy_crop / scale * float(max(int(feat_h) - 1, 0)),
+            0.0,
+            float(max(int(feat_h) - 1, 0)),
+        )
         return torch.tensor([[cx_feat, cy_feat]], device=device, dtype=dtype)
 
     def initialize(self, image, info: dict):
         z_patch_arr, resize_factor = sample_target(
-        image, info["init_bbox"], self.params.template_factor, output_sz=self.params.template_size
+            image,
+            info["init_bbox"],
+            self.params.template_factor,
+            output_sz=self.params.template_size,
         )
         template = self.preprocessor.process(z_patch_arr)
         if self.multi_modal_vision and template.size(1) == 3:
             template = torch.cat((template, template), axis=1)
+
         self.template_list = [template] * self.num_template
 
         if hasattr(self.network, "clear_online_state"):
@@ -359,7 +415,6 @@ class SUTRACK(BaseTracker):
             )
 
         self._reset_startrack_memory()
-
         self.state = info["init_bbox"]
 
         prev_box_crop = transform_image_to_crop(
@@ -382,7 +437,7 @@ class SUTRACK(BaseTracker):
         else:
             self.text_src = None
 
-        # 新增：初始化第一帧 anchor
+        # 初始化第一帧 anchor
         self._init_startrack_first_frame_anchor(image, info["init_bbox"])
 
     @staticmethod
@@ -393,18 +448,13 @@ class SUTRACK(BaseTracker):
         """
         if not isinstance(score_map, torch.Tensor):
             return None
-
         sm = score_map.detach().float()
-
         while sm.dim() > 2:
             sm = sm[0]
-
         if sm.dim() != 2:
             return None
-
         sm = torch.nan_to_num(sm, nan=0.0, posinf=0.0, neginf=0.0)
         return sm.cpu()
-
 
     @staticmethod
     def _topk_from_score_map(score_map, topk=8):
@@ -413,43 +463,36 @@ class SUTRACK(BaseTracker):
 
         Return:
             coords_xy: [K, 2], each row is [x, y]
-            scores:    [K]
+            scores: [K]
         """
         if not isinstance(score_map, torch.Tensor):
             return None, None
-
         sm = score_map.detach().float()
-
         while sm.dim() > 2:
             sm = sm[0]
-
         if sm.dim() != 2:
             return None, None
-
         sm = torch.nan_to_num(sm, nan=0.0, posinf=0.0, neginf=0.0)
-
         h, w = sm.shape
         flat = sm.reshape(-1)
-
         k = min(int(topk), int(flat.numel()))
         if k <= 0:
             return None, None
-
         scores, indices = torch.topk(flat, k=k, largest=True, sorted=True)
-
         ys = torch.div(indices, w, rounding_mode="floor")
         xs = indices % w
-
         coords_xy = torch.stack([xs.float(), ys.float()], dim=-1)
-
         return coords_xy.cpu(), scores.cpu()
-
 
     def track(self, image, info: dict = None):
         H, W, _ = image.shape
         self.frame_id += 1
+
         x_patch_arr, resize_factor = sample_target(
-            image, self.state, self.params.search_factor, output_sz=self.params.search_size
+            image,
+            self.state,
+            self.params.search_factor,
+            output_sz=self.params.search_size,
         )
         search = self.preprocessor.process(x_patch_arr)
         if self.multi_modal_vision and search.size(1) == 3:
@@ -477,8 +520,7 @@ class SUTRACK(BaseTracker):
 
         pred_score_map = out_dict["score_map"]
 
-        # This response is the actual score map used by cal_bbox,
-        # i.e., after optional Hann window. This is what we visualize.
+        # This response is the actual score map used by cal_bbox, i.e. after optional Hann window.
         response = self.output_window * pred_score_map if self.cfg.TEST.WINDOW else pred_score_map
 
         # Top-8 from the final score map used for box decoding.
@@ -486,13 +528,9 @@ class SUTRACK(BaseTracker):
         topk_coords, topk_scores = self._topk_from_score_map(response, topk=vis_topk)
 
         # Also keep decoder raw map before STARTrack refinement, if available.
-        # In _apply_startrack_rerank(), you already store:
-        # out_dict["score_map_raw"] = out_dict["score_map"]
         decoder_raw_score_map = out_dict.get("score_map_raw", pred_score_map)
         decoder_raw_response = (
-            self.output_window * decoder_raw_score_map
-            if self.cfg.TEST.WINDOW
-            else decoder_raw_score_map
+            self.output_window * decoder_raw_score_map if self.cfg.TEST.WINDOW else decoder_raw_score_map
         )
         raw_topk_coords, raw_topk_scores = self._topk_from_score_map(
             decoder_raw_response,
@@ -501,11 +539,16 @@ class SUTRACK(BaseTracker):
 
         if "size_map" in out_dict:
             pred_boxes, conf_score = self.network.decoder.cal_bbox(
-                response, out_dict["size_map"], out_dict["offset_map"], return_score=True
+                response,
+                out_dict["size_map"],
+                out_dict["offset_map"],
+                return_score=True,
             )
         else:
             pred_boxes, conf_score = self.network.decoder.cal_bbox(
-                response, out_dict["offset_map"], return_score=True
+                response,
+                out_dict["offset_map"],
+                return_score=True,
             )
 
         pred_boxes = pred_boxes.view(-1, 4)
@@ -519,7 +562,10 @@ class SUTRACK(BaseTracker):
             conf_value = conf_score.item() if isinstance(conf_score, torch.Tensor) else float(conf_score)
             if (self.frame_id % self.update_intervals == 0) and (conf_value > self.update_threshold):
                 z_patch_arr, resize_factor = sample_target(
-                    image, self.state, self.params.template_factor, output_sz=self.params.template_size
+                    image,
+                    self.state,
+                    self.params.template_factor,
+                    output_sz=self.params.template_size,
                 )
                 template = self.preprocessor.process(z_patch_arr)
                 if self.multi_modal_vision and template.size(1) == 3:
@@ -543,7 +589,13 @@ class SUTRACK(BaseTracker):
             image_show = image[:, :, :3] if image.shape[-1] == 6 else image
             x1, y1, w, h = self.state
             image_bgr = cv2.cvtColor(image_show, cv2.COLOR_RGB2BGR)
-            cv2.rectangle(image_bgr, (int(x1), int(y1)), (int(x1 + w), int(y1 + h)), color=(0, 0, 255), thickness=2)
+            cv2.rectangle(
+                image_bgr,
+                (int(x1), int(y1)),
+                (int(x1 + w), int(y1 + h)),
+                color=(0, 0, 255),
+                thickness=2,
+            )
             cv2.imshow("vis", image_bgr)
             cv2.waitKey(1)
 
@@ -552,9 +604,16 @@ class SUTRACK(BaseTracker):
             peak_info = {
                 "rerank_used": self._aux_bool(aux_info, "rerank_used", False),
                 "should_update": self._aux_bool(aux_info, "should_update", False),
+                "base_should_update": self._aux_bool(aux_info, "base_should_update", False),
                 "target_prob": self._aux_float(aux_info, "target_prob", 0.0),
                 "identity_margin": self._aux_float(aux_info, "identity_margin", 0.0),
                 "ambiguity_ratio": self._aux_float(aux_info, "ambiguity_ratio", 0.0),
+                "reliability_score": self._aux_float(aux_info, "reliability_score", 0.0),
+                "selected_score_prob": self._aux_float(aux_info, "selected_score_prob", 0.0),
+                "selected_sim_first": self._aux_float(aux_info, "selected_sim_first", 0.0),
+                "selected_sim_dynamic": self._aux_float(aux_info, "selected_sim_dynamic", 0.0),
+                "selected_sim_history": self._aux_float(aux_info, "selected_sim_history", 0.0),
+                "ambiguity_conf": self._aux_float(aux_info, "ambiguity_conf", 0.0),
                 "update_history_count": self.startrack_update_count,
             }
 
@@ -564,23 +623,19 @@ class SUTRACK(BaseTracker):
             "best_score": conf_score_val,
             "is_soi": bool(peak_info.get("rerank_used", False)),
             "peak_info": peak_info,
-
             "score_map": self._vis_score_map_to_cpu(response),
-
-            # Top-8 peaks from the final score map.
-            # coords format: [x, y] in score-map coordinates.
+            # Top-8 peaks from the final score map. coords format: [x, y] in score-map coordinates.
             "topk_coords": topk_coords,
             "topk_scores": topk_scores,
-
-            # Raw decoder score map before STARTrack refinement.
-            # For baseline, this is the same as score_map.
+            # Raw decoder score map before STARTrack refinement. For baseline, this is the same as score_map.
             "score_map_decoder_raw": self._vis_score_map_to_cpu(decoder_raw_response),
             "raw_topk_coords": raw_topk_coords,
             "raw_topk_scores": raw_topk_scores,
         }
 
     def map_box_back(self, pred_box: list, resize_factor: float):
-        cx_prev, cy_prev = self.state[0] + 0.5 * self.state[2], self.state[1] + 0.5 * self.state[3]
+        cx_prev = self.state[0] + 0.5 * self.state[2]
+        cy_prev = self.state[1] + 0.5 * self.state[3]
         cx, cy, w, h = pred_box
         half_side = 0.5 * self.params.search_size / resize_factor
         cx_real = cx + (cx_prev - half_side)
@@ -588,7 +643,8 @@ class SUTRACK(BaseTracker):
         return [cx_real - 0.5 * w, cy_real - 0.5 * h, w, h]
 
     def map_box_back_batch(self, pred_box: torch.Tensor, resize_factor: float):
-        cx_prev, cy_prev = self.state[0] + 0.5 * self.state[2], self.state[1] + 0.5 * self.state[3]
+        cx_prev = self.state[0] + 0.5 * self.state[2]
+        cy_prev = self.state[1] + 0.5 * self.state[3]
         cx, cy, w, h = pred_box.unbind(-1)
         half_side = 0.5 * self.params.search_size / resize_factor
         cx_real = cx + (cx_prev - half_side)

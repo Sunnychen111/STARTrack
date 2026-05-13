@@ -1,0 +1,22 @@
+# 字节码和缓存
+__pycache__/
+*.pyc
+
+# 权重和模型
+checkpoints/
+pretrained/
+*.pth
+*.onnx
+
+# 训练/测试输出和中间帧 (这些最占空间)
+got10k_test_newstage4/
+got10k_test_stage4_outputs/
+stage4_hard_frames/
+stage4_hard_frames_b224/
+results/
+test/
+
+# 日志和文本
+logs/
+*.txt
+*.log
