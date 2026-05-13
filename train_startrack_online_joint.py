@@ -110,6 +110,12 @@ def _yaml_defaults_from_dict(data):
             "rel_ambiguity_weight": "rel_ambiguity_weight",
             "rel_motion_weight": "rel_motion_weight",
             "rel_history_weight": "rel_history_weight",
+            "use_trainable_reliability": "use_trainable_reliability",
+            "rel_update_thresh": "rel_update_thresh",
+            "rel_lambda": "rel_lambda",
+            "rel_loss_type": "rel_loss_type",
+            "rel_iou_thr": "rel_iou_thr",
+            "freeze_crg_in_stage4": "freeze_crg_in_stage4",
             "teacher_prob_start": "teacher_prob_start",
             "teacher_prob_end": "teacher_prob_end",
             "teacher_decay_epochs": "teacher_decay_epochs",
@@ -129,6 +135,26 @@ def _yaml_defaults_from_dict(data):
             "rel_ambiguity_weight": "rel_ambiguity_weight",
             "rel_motion_weight": "rel_motion_weight",
             "rel_history_weight": "rel_history_weight",
+            "use_trainable_reliability": "use_trainable_reliability",
+            "rel_update_thresh": "rel_update_thresh",
+            "rel_lambda": "rel_lambda",
+            "rel_loss_type": "rel_loss_type",
+            "rel_iou_thr": "rel_iou_thr",
+            "freeze_crg_in_stage4": "freeze_crg_in_stage4",
+        },
+        "reliability": {
+            "USE_TRAINABLE_RELIABILITY": "use_trainable_reliability",
+            "REL_UPDATE_THRESH": "rel_update_thresh",
+            "REL_LAMBDA": "rel_lambda",
+            "REL_LOSS_TYPE": "rel_loss_type",
+            "REL_IOU_THR": "rel_iou_thr",
+            "FREEZE_CRG_IN_STAGE4": "freeze_crg_in_stage4",
+            "use_trainable_reliability": "use_trainable_reliability",
+            "rel_update_thresh": "rel_update_thresh",
+            "rel_lambda": "rel_lambda",
+            "rel_loss_type": "rel_loss_type",
+            "rel_iou_thr": "rel_iou_thr",
+            "freeze_crg_in_stage4": "freeze_crg_in_stage4",
         },
         "optimizer": {
             "lr_reranker": "lr_reranker",
@@ -286,6 +312,20 @@ def parse_args():
     parser.add_argument("--rel-ambiguity-weight", type=float, default=float(_default(yaml_defaults, "rel_ambiguity_weight", 0.15)))
     parser.add_argument("--rel-motion-weight", type=float, default=float(_default(yaml_defaults, "rel_motion_weight", 0.10)))
     parser.add_argument("--rel-history-weight", type=float, default=float(_default(yaml_defaults, "rel_history_weight", 0.15)))
+    parser.add_argument(
+        "--use-trainable-reliability",
+        action=argparse.BooleanOptionalAction,
+        default=bool(_default(yaml_defaults, "use_trainable_reliability", True)),
+    )
+    parser.add_argument("--rel-update-thresh", type=float, default=float(_default(yaml_defaults, "rel_update_thresh", 0.45)))
+    parser.add_argument("--rel-lambda", type=float, default=float(_default(yaml_defaults, "rel_lambda", 0.05)))
+    parser.add_argument("--rel-loss-type", type=str, choices=["mse", "bce"], default=_default(yaml_defaults, "rel_loss_type", "mse"))
+    parser.add_argument("--rel-iou-thr", type=float, default=float(_default(yaml_defaults, "rel_iou_thr", 0.5)))
+    parser.add_argument(
+        "--freeze-crg-in-stage4",
+        action=argparse.BooleanOptionalAction,
+        default=bool(_default(yaml_defaults, "freeze_crg_in_stage4", False)),
+    )
     parser.add_argument("--teacher-prob-start", type=float, default=float(_default(yaml_defaults, "teacher_prob_start", 1.0)))
     parser.add_argument("--teacher-prob-end", type=float, default=float(_default(yaml_defaults, "teacher_prob_end", 0.2)))
     parser.add_argument("--teacher-decay-epochs", type=int, default=int(_default(yaml_defaults, "teacher_decay_epochs", 10)))
@@ -825,6 +865,7 @@ def build_disambiguator(model, args):
         use_template_anchor=False,
         use_first_frame_anchor=False,
         use_history_aware_rerank_score=False,
+        use_trainable_reliability=bool(args.use_trainable_reliability),
     )
     ckpt = torch.load(args.reranker_ckpt, map_location="cpu", weights_only=False)
     if isinstance(ckpt, dict) and "model" in ckpt:
@@ -834,9 +875,15 @@ def build_disambiguator(model, args):
     else:
         state = unwrap_state_dict(ckpt)
     state = strip_module_prefix(state)
+    reliability_keys = [k for k in state.keys() if k.startswith("reliability_gate.")]
     missing, unexpected = disambiguator.load_state_dict(state, strict=False)
     print(f"[INFO] Reranker checkpoint loaded: {args.reranker_ckpt}")
     print(f"[INFO] Reranker missing_keys={len(missing)}, unexpected_keys={len(unexpected)}")
+    if args.use_trainable_reliability:
+        print("[INFO] trainable CRG enabled.")
+        print(f"[INFO] loaded reliability_gate keys: {len(reliability_keys)}")
+        if len(reliability_keys) == 0:
+            print("[WARN] no reliability_gate keys found in checkpoint; CRG is randomly initialized.")
     return disambiguator
 
 
@@ -866,10 +913,24 @@ def set_trainable(model, disambiguator, args):
     disambiguator.train()
     for param in disambiguator.parameters():
         param.requires_grad_(True)
+    if not bool(args.use_trainable_reliability) and getattr(disambiguator, "reliability_gate", None) is not None:
+        for param in disambiguator.reliability_gate.parameters():
+            param.requires_grad_(False)
+    if bool(args.freeze_crg_in_stage4) and getattr(disambiguator, "reliability_gate", None) is not None:
+        for param in disambiguator.reliability_gate.parameters():
+            param.requires_grad_(False)
 
 
 def count_params(module):
     return sum(int(p.numel()) for p in module.parameters() if p.requires_grad)
+
+
+def count_named_trainable(module, name_prefix):
+    return sum(
+        int(p.numel())
+        for name, p in module.named_parameters()
+        if name.startswith(name_prefix) and p.requires_grad
+    )
 
 
 def build_optimizer(model, disambiguator, args):
@@ -1335,6 +1396,7 @@ def choose_update(
     history_tokens=None,
     reliability_score=None,
     reliability_debug=None,
+    rel_prob_t=None,
 ):
     """Choose the state/history update for the 3-stage Stage4 curriculum.
 
@@ -1380,9 +1442,23 @@ def choose_update(
     if reliability_debug is None:
         reliability_debug = {}
 
-    use_reliability_gate = bool(getattr(args, "use_heuristic_reliability_gate", True))
-    raw_reliability_pass = float(reliability_score) >= float(args.reliability_update_thresh)
-    reliability_pass = (not use_reliability_gate) or raw_reliability_pass
+    trainable_reliability_used = rel_prob_t is not None
+    if trainable_reliability_used:
+        pred_rel = float(rel_prob_t[0, pred_idx].detach().clamp(0.0, 1.0).item())
+        reliability_score = pred_rel
+        reliability_pass = pred_rel >= float(args.rel_update_thresh)
+        raw_reliability_pass = reliability_pass
+    else:
+        pred_rel = float(reliability_score)
+        use_reliability_gate = bool(getattr(args, "use_heuristic_reliability_gate", True))
+        raw_reliability_pass = float(reliability_score) >= float(args.reliability_update_thresh)
+        reliability_pass = (not use_reliability_gate) or raw_reliability_pass
+
+    prob_thresh = (
+        float(args.safe_pred_prob_thresh)
+        if mode == "safe_predicted"
+        else float(args.takeover_prob_thresh)
+    )
 
     # Predicted-state takeover is only meaningful for a non-baseline candidate.
     motion_ok = (
@@ -1390,6 +1466,14 @@ def choose_update(
         if prev_state is None
         else candidate_motion_ok(topk_bboxes_xywh[pred_idx], prev_state, args)
     )
+    would_takeover_no_rel = (
+        pred_idx != 0
+        and pred_prob >= prob_thresh
+        and motion_ok
+    )
+    blocked_by_prob = pred_idx != 0 and pred_prob < prob_thresh
+    blocked_by_motion = pred_idx != 0 and pred_prob >= prob_thresh and not motion_ok
+    blocked_by_rel_takeover = bool(would_takeover_no_rel and not reliability_pass)
     scheduled_safe = (
         pred_idx != 0
         and pred_prob >= float(args.takeover_prob_thresh)
@@ -1466,10 +1550,17 @@ def choose_update(
         "state_takeover": bool(state_takeover),
         "history_from_teacher": bool(history_from_teacher),
         "effective_update_mode": mode,
+        "pred_rel": float(pred_rel),
+        "rel_update_thresh": float(args.rel_update_thresh if trainable_reliability_used else args.reliability_update_thresh),
+        "trainable_reliability_used": bool(trainable_reliability_used),
         "reliability_score": float(reliability_score),
         "reliability_pass": bool(reliability_pass),
         "raw_reliability_pass": bool(raw_reliability_pass),
-        "reliability_blocked": bool(use_reliability_gate and pred_idx != 0 and not raw_reliability_pass),
+        "reliability_blocked": bool(pred_idx != 0 and not reliability_pass),
+        "would_takeover_no_rel": bool(would_takeover_no_rel),
+        "blocked_by_rel_takeover": bool(blocked_by_rel_takeover),
+        "blocked_by_prob": bool(blocked_by_prob),
+        "blocked_by_motion": bool(blocked_by_motion),
         "reliability_debug": dict(reliability_debug),
     }
 
@@ -1489,6 +1580,35 @@ def cuda_mem(device):
         torch.cuda.memory_allocated(dev) / (1024.0 ** 2),
         torch.cuda.memory_reserved(dev) / (1024.0 ** 2),
     )
+
+
+def add_stage4_reliability_loss(loss_dict, rel_logits, rel_prob, topk_ious, valid_mask, args):
+    zero = loss_dict["loss"].sum() * 0.0
+    if (
+        not bool(args.use_trainable_reliability)
+        or bool(args.freeze_crg_in_stage4)
+        or rel_logits is None
+        or rel_prob is None
+    ):
+        loss_dict["rel_loss"] = zero.detach()
+        return loss_dict
+
+    valid_mask = valid_mask.to(device=rel_prob.device, dtype=torch.bool)
+    topk_ious = topk_ious.to(device=rel_prob.device, dtype=rel_prob.dtype).clamp(0.0, 1.0)
+    if int(valid_mask.sum().detach().item()) <= 0:
+        rel_loss = zero
+    elif args.rel_loss_type == "mse":
+        rel_loss = F.mse_loss(rel_prob[valid_mask], topk_ious[valid_mask])
+    else:
+        rel_target = (topk_ious >= float(args.rel_iou_thr)).to(dtype=rel_prob.dtype)
+        rel_loss = F.binary_cross_entropy_with_logits(
+            rel_logits[valid_mask],
+            rel_target[valid_mask],
+        )
+
+    loss_dict["loss"] = loss_dict["loss"] + float(args.rel_lambda) * rel_loss
+    loss_dict["rel_loss"] = rel_loss.detach()
+    return loss_dict
 
 
 def run_clip(model, disambiguator, criterion, data, epoch, args, cfg_obj):
@@ -1520,6 +1640,12 @@ def run_clip(model, disambiguator, criterion, data, epoch, args, cfg_obj):
     reliability_score_list = []
     reliability_pass_list = []
     reliability_block_list = []
+    rel_logits_list = []
+    rel_prob_list = []
+    pred_rel_list = []
+    pred_rel_nonzero_list = []
+    blocked_by_rel_takeover_list = []
+    would_takeover_no_rel_list = []
     pred_prob_list = []
     pred_correct_list = []
     target_nonzero_list = []
@@ -1598,11 +1724,28 @@ def run_clip(model, disambiguator, criterion, data, epoch, args, cfg_obj):
             assert_iou_target_shapes(best_iou, best_idx, baseline_iou, valid)
 
         hist_tensor = make_history_tensor(history_tokens, args.history_len)
-        logits_t = disambiguator.forward_topk(
-            topk_feats,
-            topk_scores,
-            history_tokens=hist_tensor,
-        )
+        if args.use_trainable_reliability:
+            out_t = disambiguator.forward_topk(
+                topk_feats,
+                topk_scores,
+                history_tokens=hist_tensor,
+                return_aux=True,
+            )
+            logits_t = out_t["logits"]
+            rel_logits_t = out_t["rel_logits"]
+            rel_prob_t = out_t["rel_prob"]
+            if rel_prob_t is None:
+                raise RuntimeError("use_trainable_reliability=True but forward_topk returned rel_prob=None")
+            rel_logits_list.append(rel_logits_t.squeeze(0))
+            rel_prob_list.append(rel_prob_t.squeeze(0))
+        else:
+            logits_t = disambiguator.forward_topk(
+                topk_feats,
+                topk_scores,
+                history_tokens=hist_tensor,
+            )
+            rel_logits_t = None
+            rel_prob_t = None
 
         iou_gain = best_iou - baseline_iou
         apply_label = (
@@ -1622,6 +1765,7 @@ def run_clip(model, disambiguator, criterion, data, epoch, args, cfg_obj):
             prev_state=state,
             topk_scores=topk_scores,
             history_tokens=history_tokens,
+            rel_prob_t=rel_prob_t,
         )
 
         state = update_info["state_bbox"].detach().cpu().tolist()
@@ -1644,6 +1788,11 @@ def run_clip(model, disambiguator, criterion, data, epoch, args, cfg_obj):
         reliability_score_list.append(float(update_info["reliability_score"]))
         reliability_pass_list.append(float(update_info["reliability_pass"]))
         reliability_block_list.append(float(update_info["reliability_blocked"]))
+        pred_rel_list.append(float(update_info["pred_rel"]))
+        if update_info["pred_idx"] != 0:
+            pred_rel_nonzero_list.append(float(update_info["pred_rel"]))
+        blocked_by_rel_takeover_list.append(float(update_info["blocked_by_rel_takeover"]))
+        would_takeover_no_rel_list.append(float(update_info["would_takeover_no_rel"]))
         pred_prob_list.append(float(update_info["pred_prob"]))
         pred_correct_list.append(float(update_info["pred_idx"] == int(best_idx.item()) and bool(valid.item())))
         target_nonzero_list.append(float(int(best_idx.item()) != 0 and bool(valid.item())))
@@ -1655,6 +1804,20 @@ def run_clip(model, disambiguator, criterion, data, epoch, args, cfg_obj):
     valid_mask = torch.stack(valid_list, dim=0).bool()
     topk_ious = torch.stack(iou_list, dim=0)
     loss_dict = criterion(logits, target_idx, valid_mask, topk_ious=topk_ious)
+    if args.use_trainable_reliability and len(rel_prob_list) > 0:
+        rel_logits = torch.stack(rel_logits_list, dim=0)
+        rel_prob = torch.stack(rel_prob_list, dim=0)
+    else:
+        rel_logits = None
+        rel_prob = None
+    loss_dict = add_stage4_reliability_loss(
+        loss_dict=loss_dict,
+        rel_logits=rel_logits,
+        rel_prob=rel_prob,
+        topk_ious=topk_ious,
+        valid_mask=valid_mask,
+        args=args,
+    )
 
     valid_count = int(valid_mask.sum().detach().item())
     valid_float = valid_mask.float()
@@ -1667,6 +1830,26 @@ def run_clip(model, disambiguator, criterion, data, epoch, args, cfg_obj):
     min_reliability_score = min(reliability_score_list) if len(reliability_score_list) > 0 else 0.0
     reliability_pass_ratio = sum(reliability_pass_list) / clip_len
     reliability_block_ratio = sum(reliability_block_list) / clip_len
+    pred_rel_mean = sum(pred_rel_list) / clip_len
+    pred_rel_nonzero_mean = (
+        sum(pred_rel_nonzero_list) / max(len(pred_rel_nonzero_list), 1)
+        if len(pred_rel_nonzero_list) > 0
+        else 0.0
+    )
+    blocked_by_rel_takeover_ratio = sum(blocked_by_rel_takeover_list) / clip_len
+    would_takeover_no_rel_ratio = sum(would_takeover_no_rel_list) / clip_len
+    if rel_prob is not None and int(valid_mask.sum().item()) > 0:
+        valid_rel_prob = rel_prob.detach()[valid_mask]
+        valid_ious = topk_ious.detach().to(device=valid_rel_prob.device, dtype=valid_rel_prob.dtype)[valid_mask]
+        best_rel_idx = valid_ious.argmax(dim=1, keepdim=True)
+        bad_mask = valid_ious < 0.3
+        rel_prob_mean = float(valid_rel_prob.mean().item())
+        rel_prob_best_mean = float(valid_rel_prob.gather(1, best_rel_idx).mean().item())
+        rel_prob_bad_mean = float(valid_rel_prob[bad_mask].mean().item()) if bool(bad_mask.any().item()) else 0.0
+    else:
+        rel_prob_mean = 0.0
+        rel_prob_best_mean = 0.0
+        rel_prob_bad_mean = 0.0
     pred_correct = sum(pred_correct_list) / float(denom)
     target_nonzero = sum(target_nonzero_list) / float(denom)
     apply_positive = sum(apply_label_list) / float(max(len(apply_label_list), 1))
@@ -1688,6 +1871,14 @@ def run_clip(model, disambiguator, criterion, data, epoch, args, cfg_obj):
         "min_reliability_score": min_reliability_score,
         "reliability_pass_ratio": reliability_pass_ratio,
         "reliability_block_ratio": reliability_block_ratio,
+        "rel_loss": float(loss_dict.get("rel_loss", torch.tensor(0.0, device=logits.device)).detach().item()),
+        "rel_prob_mean": rel_prob_mean,
+        "rel_prob_best_mean": rel_prob_best_mean,
+        "rel_prob_bad_mean": rel_prob_bad_mean,
+        "pred_rel_mean": pred_rel_mean,
+        "pred_rel_nonzero_mean": pred_rel_nonzero_mean,
+        "blocked_by_rel_takeover_ratio": blocked_by_rel_takeover_ratio,
+        "would_takeover_no_rel_ratio": would_takeover_no_rel_ratio,
         "pred_correct_ratio": pred_correct,
         "fallback_frames": fallback_frames,
         "effective_update_mode": effective_update_mode(epoch, args),
@@ -1697,6 +1888,7 @@ def run_clip(model, disambiguator, criterion, data, epoch, args, cfg_obj):
         "last_history_idx": int(history_idx_list[-1]) if len(history_idx_list) > 0 else -1,
         "last_reliability_score": float(reliability_score_list[-1]) if len(reliability_score_list) > 0 else 0.0,
         "last_reliability_pass": bool(reliability_pass_list[-1]) if len(reliability_pass_list) > 0 else False,
+        "last_pred_rel": float(pred_rel_list[-1]) if len(pred_rel_list) > 0 else 0.0,
         "last_pred_prob": float(pred_prob_list[-1]) if len(pred_prob_list) > 0 else 0.0,
         "last_baseline_iou": float(baseline_iou_list[-1].item()) if len(baseline_iou_list) > 0 else 0.0,
         "last_best_iou": float(best_iou_list[-1].item()) if len(best_iou_list) > 0 else 0.0,
@@ -1777,6 +1969,11 @@ def main():
     print(f"[INFO] max_scale_ratio        : {args.max_scale_ratio}")
     print(f"[INFO] reliability_gate       : {args.use_heuristic_reliability_gate}")
     print(f"[INFO] reliability_thresh     : {args.reliability_update_thresh}")
+    print(f"[INFO] trainable_crg          : {args.use_trainable_reliability}")
+    print(f"[INFO] rel_update_thresh      : {args.rel_update_thresh}")
+    print(f"[INFO] rel_lambda             : {args.rel_lambda}")
+    print(f"[INFO] rel_loss_type          : {args.rel_loss_type}")
+    print(f"[INFO] freeze_crg_in_stage4   : {args.freeze_crg_in_stage4}")
     print(f"[INFO] rollout_len            : {args.rollout_len}")
     print(f"[INFO] topk                   : {args.topk}")
     print(f"[INFO] iou_thresh             : {args.iou_thresh}")
@@ -1784,6 +1981,8 @@ def main():
     print(f"[INFO] unfreeze_decoder       : {args.unfreeze_decoder}")
     print(f"[INFO] detach_history         : {args.detach_history}")
     print(f"[INFO] trainable reranker     : {count_params(disambiguator):,}")
+    print(f"[INFO] trainable params in reliability_gate: {count_named_trainable(disambiguator, 'reliability_gate.'):,}")
+    print(f"[INFO] trainable params in reranker/mamba: {count_params(disambiguator) - count_named_trainable(disambiguator, 'reliability_gate.'):,}")
     print(f"[INFO] trainable decoder      : {count_params(model.decoder):,}")
     print("=" * 100)
 
@@ -1798,10 +1997,15 @@ def main():
             model.load_state_dict(ckpt["sutrack"])
         # 恢复重排序器 Mamba 状态
         if "disambiguator" in ckpt:
-            disambiguator.load_state_dict(ckpt["disambiguator"])
+            missing, unexpected = disambiguator.load_state_dict(ckpt["disambiguator"], strict=False)
+            if missing or unexpected:
+                print(f"[*] Resumed disambiguator strict=False (missing={len(missing)}, unexpected={len(unexpected)})")
         # 恢复优化器状态 (保留动量和学习率衰减进度)
         if "optimizer" in ckpt:
-            optimizer.load_state_dict(ckpt["optimizer"])
+            try:
+                optimizer.load_state_dict(ckpt["optimizer"])
+            except ValueError as exc:
+                print(f"[WARN] Skip optimizer resume because parameter groups changed: {exc}")
             
         start_epoch = ckpt.get("epoch", 0) + 1
         best_loss = ckpt.get("metrics", {}).get("loss", math.inf)
@@ -1819,6 +2023,7 @@ def main():
             "loss": 0.0,
             "ce_loss": 0.0,
             "rank_loss": 0.0,
+            "rel_loss": 0.0,
             "valid_frames": 0,
             "avg_baseline_iou": 0.0,
             "avg_best_iou": 0.0,
@@ -1832,6 +2037,13 @@ def main():
             "min_reliability_score": 0.0,
             "reliability_pass_ratio": 0.0,
             "reliability_block_ratio": 0.0,
+            "rel_prob_mean": 0.0,
+            "rel_prob_best_mean": 0.0,
+            "rel_prob_bad_mean": 0.0,
+            "pred_rel_mean": 0.0,
+            "pred_rel_nonzero_mean": 0.0,
+            "blocked_by_rel_takeover_ratio": 0.0,
+            "would_takeover_no_rel_ratio": 0.0,
             "pred_correct_ratio": 0.0,
             "clips": 0,
             "skipped": 0,
@@ -1895,6 +2107,7 @@ def main():
             totals["loss"] += loss_value
             totals["ce_loss"] += clip_metrics["ce_loss"]
             totals["rank_loss"] += clip_metrics["rank_loss"]
+            totals["rel_loss"] += clip_metrics["rel_loss"]
             totals["valid_frames"] += clip_metrics["valid_frames"]
             for key in (
                 "avg_baseline_iou",
@@ -1909,6 +2122,13 @@ def main():
                 "min_reliability_score",
                 "reliability_pass_ratio",
                 "reliability_block_ratio",
+                "rel_prob_mean",
+                "rel_prob_best_mean",
+                "rel_prob_bad_mean",
+                "pred_rel_mean",
+                "pred_rel_nonzero_mean",
+                "blocked_by_rel_takeover_ratio",
+                "would_takeover_no_rel_ratio",
                 "pred_correct_ratio",
             ):
                 totals[key] += clip_metrics[key]
@@ -1924,7 +2144,7 @@ def main():
                     "valid": clip_metrics["valid_frames"],
                     "best": f"{clip_metrics['last_best_iou']:.3f}",
                     "gain": f"{clip_metrics['last_best_iou'] - clip_metrics['last_baseline_iou']:.3f}",
-                    "rel": f"{clip_metrics['last_reliability_score']:.3f}",
+                    "rel": f"{clip_metrics['last_pred_rel']:.3f}",
                     "mem": f"{mem_alloc:.0f}/{mem_reserved:.0f}MB",
                 })
                 print(
@@ -1934,6 +2154,7 @@ def main():
                     f"target_idx={clip_metrics['last_target_idx']} pred_idx={clip_metrics['last_pred_idx']} "
                     f"state_idx={clip_metrics['last_state_idx']} history_idx={clip_metrics['last_history_idx']} "
                     f"pred_prob={clip_metrics['last_pred_prob']:.4f} "
+                    f"pred_rel={clip_metrics['last_pred_rel']:.4f} "
                     f"reliability_score={clip_metrics['last_reliability_score']:.4f} "
                     f"reliability_pass={clip_metrics['last_reliability_pass']} "
                     f"baseline_iou={clip_metrics['last_baseline_iou']:.4f} "
@@ -1949,6 +2170,7 @@ def main():
             "loss": totals["loss"] / denom,
             "ce_loss": totals["ce_loss"] / denom,
             "rank_loss": totals["rank_loss"] / denom,
+            "rel_loss": totals["rel_loss"] / denom,
             "valid_frames": totals["valid_frames"],
             "avg_baseline_iou": totals["avg_baseline_iou"] / denom,
             "avg_best_iou": totals["avg_best_iou"] / denom,
@@ -1962,6 +2184,13 @@ def main():
             "min_reliability_score": totals["min_reliability_score"] / denom,
             "reliability_pass_ratio": totals["reliability_pass_ratio"] / denom,
             "reliability_block_ratio": totals["reliability_block_ratio"] / denom,
+            "rel_prob_mean": totals["rel_prob_mean"] / denom,
+            "rel_prob_best_mean": totals["rel_prob_best_mean"] / denom,
+            "rel_prob_bad_mean": totals["rel_prob_bad_mean"] / denom,
+            "pred_rel_mean": totals["pred_rel_mean"] / denom,
+            "pred_rel_nonzero_mean": totals["pred_rel_nonzero_mean"] / denom,
+            "blocked_by_rel_takeover_ratio": totals["blocked_by_rel_takeover_ratio"] / denom,
+            "would_takeover_no_rel_ratio": totals["would_takeover_no_rel_ratio"] / denom,
             "pred_correct_ratio": totals["pred_correct_ratio"] / denom,
             "update_mode": args.update_mode,
             "effective_update_mode": effective_update_mode(epoch, args),
@@ -1985,7 +2214,8 @@ def main():
         print(
             f"[Epoch {epoch:03d}] "
             f"Loss/total={metrics['loss']:.4f} Loss/ce={metrics['ce_loss']:.4f} "
-            f"Loss/rank={metrics['rank_loss']:.4f} valid_frames={metrics['valid_frames']} "
+            f"Loss/rank={metrics['rank_loss']:.4f} Rel/loss={metrics['rel_loss']:.4f} "
+            f"valid_frames={metrics['valid_frames']} "
             f"avg_baseline_iou={metrics['avg_baseline_iou']:.4f} "
             f"avg_best_iou={metrics['avg_best_iou']:.4f} avg_iou_gain={metrics['avg_iou_gain']:.4f} "
             f"target_nonzero_ratio={metrics['target_nonzero_ratio']:.4f} "
@@ -1997,6 +2227,13 @@ def main():
             f"min_reliability_score={metrics['min_reliability_score']:.4f} "
             f"reliability_pass_ratio={metrics['reliability_pass_ratio']:.4f} "
             f"reliability_block_ratio={metrics['reliability_block_ratio']:.4f} "
+            f"Rel/prob_mean={metrics['rel_prob_mean']:.4f} "
+            f"Rel/best_mean={metrics['rel_prob_best_mean']:.4f} "
+            f"Rel/bad_mean={metrics['rel_prob_bad_mean']:.4f} "
+            f"pred_rel_mean={metrics['pred_rel_mean']:.4f} "
+            f"pred_rel_nonzero_mean={metrics['pred_rel_nonzero_mean']:.4f} "
+            f"blocked_by_rel_takeover_ratio={metrics['blocked_by_rel_takeover_ratio']:.4f} "
+            f"would_takeover_no_rel_ratio={metrics['would_takeover_no_rel_ratio']:.4f} "
             f"pred_correct_ratio={metrics['pred_correct_ratio']:.4f} "
             f"update_mode={metrics['update_mode']} effective_stage={metrics['effective_update_mode']} "
             f"teacher_prob={metrics['teacher_prob']:.3f} "

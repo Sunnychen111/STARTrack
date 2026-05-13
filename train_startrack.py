@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 
 import torch
+import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -38,6 +39,10 @@ def parse_args():
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--rank-lambda", type=float, default=0.05)
     parser.add_argument("--margin", type=float, default=0.2)
+    parser.add_argument("--use-trainable-reliability", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--rel-lambda", type=float, default=0.2)
+    parser.add_argument("--rel-loss-type", type=str, choices=["mse", "bce"], default="mse")
+    parser.add_argument("--rel-iou-thr", type=float, default=0.5)
 
     parser.add_argument("--num-workers", type=int, default=8)
     parser.add_argument("--batch-size", type=int, default=1)
@@ -108,6 +113,7 @@ def build_model(feat_dim, args):
         use_template_anchor=False,
         use_first_frame_anchor=False,
         use_history_aware_rerank_score=False,
+        use_trainable_reliability=args.use_trainable_reliability,
     )
 
 
@@ -161,6 +167,60 @@ def _compute_iou_metrics(logits, topk_ious, best_iou, valid_mask, loss_dict):
     return loss_dict
 
 
+def _add_reliability_loss(loss_dict, rel_logits, rel_prob, topk_ious, valid_mask, args):
+    if rel_logits is None or rel_prob is None or not bool(args.use_trainable_reliability):
+        zero = loss_dict["loss"].sum() * 0.0
+        loss_dict.update({
+            "rel_loss": zero.detach(),
+            "rel_prob_mean": zero.detach(),
+            "rel_prob_best_mean": zero.detach(),
+            "rel_prob_bad_mean": zero.detach(),
+            "rel_target_mean": zero.detach(),
+        })
+        return loss_dict
+
+    valid_mask = valid_mask.to(device=rel_prob.device, dtype=torch.bool)
+    topk_ious = topk_ious.to(device=rel_prob.device, dtype=rel_prob.dtype).clamp(0.0, 1.0)
+
+    if int(valid_mask.sum().detach().item()) <= 0:
+        loss_rel = rel_prob.sum() * 0.0
+        rel_prob_mean = loss_rel.detach()
+        rel_prob_best_mean = loss_rel.detach()
+        rel_prob_bad_mean = loss_rel.detach()
+        rel_target_mean = loss_rel.detach()
+    else:
+        valid_rel_prob = rel_prob[valid_mask]
+        valid_ious = topk_ious[valid_mask]
+
+        if args.rel_loss_type == "mse":
+            rel_target = valid_ious
+            loss_rel = F.mse_loss(valid_rel_prob, rel_target)
+        else:
+            rel_target = (valid_ious >= float(args.rel_iou_thr)).to(dtype=rel_prob.dtype)
+            loss_rel = F.binary_cross_entropy_with_logits(rel_logits[valid_mask], rel_target)
+
+        best_idx = valid_ious.argmax(dim=1, keepdim=True)
+        bad_mask = valid_ious < 0.3
+        rel_prob_mean = valid_rel_prob.mean().detach()
+        rel_prob_best_mean = valid_rel_prob.gather(1, best_idx).mean().detach()
+        rel_prob_bad_mean = (
+            valid_rel_prob[bad_mask].mean().detach()
+            if bool(bad_mask.any().item())
+            else (valid_rel_prob.sum() * 0.0).detach()
+        )
+        rel_target_mean = rel_target.mean().detach()
+
+    loss_dict["loss"] = loss_dict["loss"] + float(args.rel_lambda) * loss_rel
+    loss_dict.update({
+        "rel_loss": loss_rel.detach(),
+        "rel_prob_mean": rel_prob_mean,
+        "rel_prob_best_mean": rel_prob_best_mean,
+        "rel_prob_bad_mean": rel_prob_bad_mean,
+        "rel_target_mean": rel_target_mean,
+    })
+    return loss_dict
+
+
 def forward_stage0(model, sample, criterion, args):
     """Stage 0: 纯空间重排序，不使用历史特征"""
     topk_feats = sample["topk_feats"]
@@ -175,12 +235,39 @@ def forward_stage0(model, sample, criterion, args):
 
     model.reset_history(batch_size=1)
     logits = []
+    rel_logits_list = []
+    rel_prob_list = []
     for t in range(topk_feats.size(0)):
-        logits_t = model.forward_topk(topk_feats[t:t+1], topk_scores[t:t+1], history_tokens=None)
+        if args.use_trainable_reliability:
+            out_t = model.forward_topk(
+                topk_feats[t:t+1],
+                topk_scores[t:t+1],
+                history_tokens=None,
+                return_aux=True,
+            )
+            logits_t = out_t["logits"]
+            rel_logits_list.append(out_t["rel_logits"].squeeze(0))
+            rel_prob_list.append(out_t["rel_prob"].squeeze(0))
+        else:
+            logits_t = model.forward_topk(topk_feats[t:t+1], topk_scores[t:t+1], history_tokens=None)
         logits.append(logits_t.squeeze(0))
         
     logits = torch.stack(logits, dim=0)
-    loss_dict = criterion(logits, best_idx_by_iou, valid_mask)
+    loss_dict = criterion(logits, best_idx_by_iou, valid_mask, topk_ious=topk_ious)
+    if args.use_trainable_reliability:
+        rel_logits = torch.stack(rel_logits_list, dim=0)
+        rel_prob = torch.stack(rel_prob_list, dim=0)
+    else:
+        rel_logits = None
+        rel_prob = None
+    loss_dict = _add_reliability_loss(
+        loss_dict,
+        rel_logits=rel_logits,
+        rel_prob=rel_prob,
+        topk_ious=topk_ious,
+        valid_mask=valid_mask,
+        args=args,
+    )
     
     # 🟢 增加 IoU 统计
     loss_dict = _compute_iou_metrics(logits, topk_ious, best_iou, valid_mask, loss_dict)
@@ -198,11 +285,24 @@ def forward_autoregressive(model, sample, criterion, stage, epoch, args):
 
     model.reset_history(batch_size=1)
     logits = []
+    rel_logits_list = []
+    rel_prob_list = []
     history_tokens = []
 
     for t in range(topk_feats.size(0)):
         hist_tensor = make_history_tensor(history_tokens, args.history_len)
-        logits_t = model.forward_topk(topk_feats[t:t+1], topk_scores[t:t+1], history_tokens=hist_tensor)
+        if args.use_trainable_reliability:
+            out_t = model.forward_topk(
+                topk_feats[t:t+1],
+                topk_scores[t:t+1],
+                history_tokens=hist_tensor,
+                return_aux=True,
+            )
+            logits_t = out_t["logits"]
+            rel_logits_list.append(out_t["rel_logits"].squeeze(0))
+            rel_prob_list.append(out_t["rel_prob"].squeeze(0))
+        else:
+            logits_t = model.forward_topk(topk_feats[t:t+1], topk_scores[t:t+1], history_tokens=hist_tensor)
         logits.append(logits_t.squeeze(0))
 
         if not valid_mask[t].item():
@@ -214,7 +314,21 @@ def forward_autoregressive(model, sample, criterion, stage, epoch, args):
             history_tokens = history_tokens[-int(args.history_len):]
 
     logits = torch.stack(logits, dim=0)
-    loss_dict = criterion(logits, best_idx_by_iou, valid_mask)
+    loss_dict = criterion(logits, best_idx_by_iou, valid_mask, topk_ious=topk_ious)
+    if args.use_trainable_reliability:
+        rel_logits = torch.stack(rel_logits_list, dim=0)
+        rel_prob = torch.stack(rel_prob_list, dim=0)
+    else:
+        rel_logits = None
+        rel_prob = None
+    loss_dict = _add_reliability_loss(
+        loss_dict,
+        rel_logits=rel_logits,
+        rel_prob=rel_prob,
+        topk_ious=topk_ious,
+        valid_mask=valid_mask,
+        args=args,
+    )
     
     # 🟢 增加 IoU 统计
     loss_dict = _compute_iou_metrics(logits, topk_ious, best_iou, valid_mask, loss_dict)
@@ -265,8 +379,19 @@ def main():
     if args.resume and os.path.isfile(args.resume):
         print(f"[*] Loading checkpoint from {args.resume}...")
         ckpt = torch.load(args.resume, map_location=args.device)
-        model.load_state_dict(ckpt["model"])
-        optimizer.load_state_dict(ckpt["optimizer"])
+        missing, unexpected = model.load_state_dict(ckpt["model"], strict=False)
+        if missing or unexpected:
+            print(
+                f"[*] Loaded model with strict=False "
+                f"(missing={len(missing)}, unexpected={len(unexpected)})"
+            )
+            rel_missing = [k for k in missing if k.startswith("reliability_gate.")]
+            if rel_missing:
+                print(f"[*] Missing reliability_gate keys are expected for old checkpoints: {len(rel_missing)}")
+        try:
+            optimizer.load_state_dict(ckpt["optimizer"])
+        except ValueError as exc:
+            print(f"[WARN] Skip optimizer resume because parameter groups changed: {exc}")
         start_epoch = ckpt["epoch"] + 1
         best_loss = ckpt.get("metrics", {}).get("loss", math.inf)
         print(f"[*] Resumed training from epoch {start_epoch}, previous best loss: {best_loss:.4f}")
@@ -284,9 +409,10 @@ def main():
         # 强制每个 Epoch 为 Dataset 的独立采样器注入新的随机种子
         dataset.rng = random.Random(args.seed + epoch)
 
-        totals = { "loss": 0.0, "ce_loss": 0.0, "rank_loss": 0.0, "valid_frames": 0, 
+        totals = { "loss": 0.0, "ce_loss": 0.0, "rank_loss": 0.0, "rel_loss": 0.0, "valid_frames": 0, 
                    "avg_best_iou": 0.0, "avg_base_iou": 0.0, "avg_pred_iou": 0.0, 
-                   "mamba_grad_before": 0.0, "num_steps": 0 }
+                   "rel_prob_mean": 0.0, "rel_prob_best_mean": 0.0, "rel_prob_bad_mean": 0.0,
+                   "rel_target_mean": 0.0, "mamba_grad_before": 0.0, "num_steps": 0 }
 
         pbar = tqdm(loader, desc=f"Epoch {epoch:03d}/{args.epochs} [Stage {stage}]", leave=False, dynamic_ncols=True)
 
@@ -305,6 +431,7 @@ def main():
             # 安全提取各项 Loss 以便打印
             ce_loss_val = float(loss_dict.get("ce_loss", torch.tensor(0.0)).detach().item())
             rank_loss_val = float(loss_dict.get("rank_loss", torch.tensor(0.0)).detach().item())
+            rel_loss_val = float(loss_dict.get("rel_loss", torch.tensor(0.0)).detach().item())
             
             mamba_before, mamba_count = 0.0, 0
 
@@ -319,10 +446,15 @@ def main():
             totals["loss"] += float(loss.detach().item())
             totals["ce_loss"] += ce_loss_val
             totals["rank_loss"] += rank_loss_val
+            totals["rel_loss"] += rel_loss_val
             totals["valid_frames"] += int(loss_dict["valid_frames"])
             totals["avg_best_iou"] += loss_dict.get("avg_best_iou", 0.0)
             totals["avg_base_iou"] += loss_dict.get("avg_base_iou", 0.0)
             totals["avg_pred_iou"] += loss_dict.get("avg_pred_iou", 0.0)
+            totals["rel_prob_mean"] += float(loss_dict.get("rel_prob_mean", torch.tensor(0.0)).detach().item())
+            totals["rel_prob_best_mean"] += float(loss_dict.get("rel_prob_best_mean", torch.tensor(0.0)).detach().item())
+            totals["rel_prob_bad_mean"] += float(loss_dict.get("rel_prob_bad_mean", torch.tensor(0.0)).detach().item())
+            totals["rel_target_mean"] += float(loss_dict.get("rel_target_mean", torch.tensor(0.0)).detach().item())
             totals["mamba_grad_before"] += float(mamba_before)
             totals["num_steps"] += 1
 
@@ -331,6 +463,7 @@ def main():
                 pbar_dict = { 
                     "loss": f"{loss.item():.3f}", 
                     "ce": f"{ce_loss_val:.3f}", 
+                    "rel": f"{rel_loss_val:.3f}",
                     "P-IoU": f"{loss_dict.get('avg_pred_iou', 0.0):.3f}" 
                 }
                 if stage >= 1: pbar_dict["mamba_g"] = f"{mamba_before:.3f}"
@@ -341,12 +474,25 @@ def main():
             "loss": totals["loss"] / denom,
             "ce_loss": totals["ce_loss"] / denom,
             "rank_loss": totals["rank_loss"] / denom,
+            "rel_loss": totals["rel_loss"] / denom,
             "valid_frames": totals["valid_frames"],
             "avg_best_iou": totals["avg_best_iou"] / denom,
             "avg_base_iou": totals["avg_base_iou"] / denom,
             "avg_pred_iou": totals["avg_pred_iou"] / denom,
+            "rel_prob_mean": totals["rel_prob_mean"] / denom,
+            "rel_prob_best_mean": totals["rel_prob_best_mean"] / denom,
+            "rel_prob_bad_mean": totals["rel_prob_bad_mean"] / denom,
+            "rel_target_mean": totals["rel_target_mean"] / denom,
             "stage": stage,
         }
+        print(f"   [Rel] Loss/total={metrics['loss']:.4f} "
+              f"Loss/ce={metrics['ce_loss']:.4f} "
+              f"Loss/rank={metrics['rank_loss']:.4f} "
+              f"Loss/rel={metrics['rel_loss']:.4f} "
+              f"Rel/prob_mean={metrics['rel_prob_mean']:.4f} "
+              f"Rel/target_mean={metrics['rel_target_mean']:.4f} "
+              f"Rel/best_mean={metrics['rel_prob_best_mean']:.4f} "
+              f"Rel/bad_mean={metrics['rel_prob_bad_mean']:.4f}")
 
         # 🟢 在每轮结束时打印三组 IoU
         print(f"✅ Ep {epoch:03d} | Stg {stage} | Loss: {metrics['loss']:.4f} (CE: {metrics['ce_loss']:.4f}, Rank: {metrics['rank_loss']:.4f}) "

@@ -176,6 +176,58 @@ def sample_feature_at_peaks(feat_map, peaks_xy=None, peak_x=None, peak_y=None):
     return sampled.squeeze(2).transpose(1, 2).contiguous()
 
 
+class CandidateReliabilityGate(nn.Module):
+    def __init__(self, feat_dim=512, hidden_dim=128):
+        super().__init__()
+        self.feat_dim = int(feat_dim)
+        self.hidden_dim = int(hidden_dim)
+        self.mlp = nn.Sequential(
+            nn.Linear(self.feat_dim + 2, self.hidden_dim),
+            nn.ReLU(inplace=True),
+            nn.Linear(self.hidden_dim, self.hidden_dim),
+            nn.ReLU(inplace=True),
+            nn.Linear(self.hidden_dim, 1),
+        )
+
+    def forward(self, topk_feats, topk_scores, rerank_prob):
+        if topk_feats.dim() != 3:
+            raise ValueError(f"topk_feats must be [B, K, C], got {tuple(topk_feats.shape)}")
+        if topk_scores.dim() != 2:
+            raise ValueError(f"topk_scores must be [B, K], got {tuple(topk_scores.shape)}")
+        if rerank_prob.dim() != 2:
+            raise ValueError(f"rerank_prob must be [B, K], got {tuple(rerank_prob.shape)}")
+        if topk_feats.size(-1) != self.feat_dim:
+            raise ValueError(
+                f"topk_feats channel mismatch, expected {self.feat_dim}, got {topk_feats.size(-1)}"
+            )
+        if topk_scores.shape != rerank_prob.shape or topk_scores.shape != topk_feats.shape[:2]:
+            raise ValueError(
+                "topk_scores, rerank_prob, and topk_feats must agree on [B, K], "
+                f"got scores={tuple(topk_scores.shape)}, rerank={tuple(rerank_prob.shape)}, "
+                f"feats={tuple(topk_feats.shape[:2])}"
+            )
+
+        feats = torch.nan_to_num(topk_feats, nan=0.0, posinf=20.0, neginf=-20.0)
+        scores = torch.nan_to_num(
+            topk_scores.to(device=topk_feats.device, dtype=topk_feats.dtype),
+            nan=0.0,
+            posinf=20.0,
+            neginf=-20.0,
+        ).clamp(-20.0, 20.0)
+        probs = torch.nan_to_num(
+            rerank_prob.to(device=topk_feats.device, dtype=topk_feats.dtype),
+            nan=0.0,
+            posinf=1.0,
+            neginf=0.0,
+        ).clamp(0.0, 1.0)
+
+        rel_input = torch.cat([feats, scores.unsqueeze(-1), probs.unsqueeze(-1)], dim=-1)
+        rel_logits = self.mlp(rel_input).squeeze(-1)
+        rel_logits = torch.nan_to_num(rel_logits, nan=0.0, posinf=20.0, neginf=-20.0)
+        rel_prob = torch.sigmoid(rel_logits).clamp(0.0, 1.0)
+        return rel_logits, rel_prob
+
+
 class PostDecoderDisambiguator(nn.Module):
     def __init__(
         self,
@@ -214,6 +266,8 @@ class PostDecoderDisambiguator(nn.Module):
         rel_history_weight=0.15,
         rel_margin_weight=0.10,
         rel_ambiguity_weight=0.05,
+        use_trainable_reliability=True,
+        reliability_hidden_dim=128,
         eps=1e-6,
     ):
         super().__init__()
@@ -248,6 +302,8 @@ class PostDecoderDisambiguator(nn.Module):
         self.rel_history_weight = float(rel_history_weight)
         self.rel_margin_weight = float(rel_margin_weight)
         self.rel_ambiguity_weight = float(rel_ambiguity_weight)
+        self.use_trainable_reliability = bool(use_trainable_reliability)
+        self.reliability_hidden_dim = int(reliability_hidden_dim)
 
         self.eps = float(eps)
         self.template_anchor = None
@@ -277,6 +333,13 @@ class PostDecoderDisambiguator(nn.Module):
             nn.LayerNorm(32),
             nn.Linear(32, 1),
         )
+        if self.use_trainable_reliability:
+            self.reliability_gate = CandidateReliabilityGate(
+                feat_dim=self.feat_dim,
+                hidden_dim=self.reliability_hidden_dim,
+            )
+        else:
+            self.reliability_gate = None
 
     def clear_state(self):
         self.template_anchor = None
@@ -594,7 +657,21 @@ class PostDecoderDisambiguator(nn.Module):
         if not return_aux:
             return target_logits
 
-        return target_logits, {
+        rerank_prob = torch.softmax(target_logits.detach(), dim=-1)
+        rel_logits = None
+        rel_prob = None
+        if self.reliability_gate is not None:
+            rel_logits, rel_prob = self.reliability_gate(
+                topk_feats=topk_feats,
+                topk_scores=topk_scores,
+                rerank_prob=rerank_prob,
+            )
+
+        return {
+            "logits": target_logits,
+            "rerank_prob": rerank_prob,
+            "rel_logits": rel_logits,
+            "rel_prob": rel_prob,
             "target_logits": target_logits,
             "rerank_features": rerank_features,
             "score_prob": score_prob,
@@ -650,12 +727,13 @@ class PostDecoderDisambiguator(nn.Module):
         )
         peak_feats = sample_feature_at_peaks(feat_map, peaks_xy=peaks_xy)
 
-        target_logits, topk_aux = self.forward_topk(
+        topk_aux = self.forward_topk(
             peak_feats,
             peak_scores,
             history_tokens=history_tokens,
             return_aux=True,
         )
+        target_logits = topk_aux["logits"]
         target_probs = torch.softmax(target_logits, dim=-1)
         selected_prob, selected_idx = target_probs.max(dim=-1)
 
@@ -683,7 +761,33 @@ class PostDecoderDisambiguator(nn.Module):
             & (selected_idx >= 0)
         )
 
-        if self.use_heuristic_reliability:
+        rel_prob_all = topk_aux.get("rel_prob", None)
+        rel_logits_all = topk_aux.get("rel_logits", None)
+        selected_rel_prob = torch.zeros_like(selected_prob)
+        trainable_reliability_used = bool(
+            self.use_trainable_reliability and rel_prob_all is not None
+        )
+
+        if trainable_reliability_used:
+            selected_rel_prob = rel_prob_all.gather(
+                1, selected_idx.view(-1, 1)
+            ).squeeze(1)
+            reliability_score = selected_rel_prob
+            selected_score_prob = self._gather_selected_1d(score_prob, selected_idx)
+            if selected_score_prob is None:
+                selected_score_prob = torch.zeros_like(selected_prob)
+            reliability_aux = {
+                "reliability_score": reliability_score.detach(),
+                "selected_score_prob": selected_score_prob.detach(),
+                "selected_sim_first": torch.zeros_like(selected_prob).detach(),
+                "selected_sim_dynamic": torch.zeros_like(selected_prob).detach(),
+                "selected_sim_history": torch.zeros_like(selected_prob).detach(),
+                "ambiguity_conf": (1.0 - ambiguity_ratio).clamp(0.0, 1.0).detach(),
+            }
+            should_update = base_should_update & (
+                selected_rel_prob >= self.reliability_update_thresh
+            )
+        elif self.use_heuristic_reliability:
             reliability_score, reliability_aux = self._compute_heuristic_reliability(
                 selected_idx=selected_idx,
                 selected_prob=selected_prob,
@@ -699,6 +803,7 @@ class PostDecoderDisambiguator(nn.Module):
             )
         else:
             reliability_score = selected_prob.detach()
+            selected_rel_prob = reliability_score
             selected_score_prob = self._gather_selected_1d(score_prob, selected_idx)
             if selected_score_prob is None:
                 selected_score_prob = torch.zeros_like(selected_prob)
@@ -751,6 +856,23 @@ class PostDecoderDisambiguator(nn.Module):
             "target_logits": target_logits,
             "target_probs": target_probs.detach(),
             "score_prob": score_prob.detach(),
+            "selected_rel_prob": selected_rel_prob.detach(),
+            "rel_prob_all": (
+                rel_prob_all.detach()
+                if rel_prob_all is not None
+                else torch.zeros_like(target_probs).detach()
+            ),
+            "rel_logits_all": (
+                rel_logits_all.detach()
+                if rel_logits_all is not None
+                else torch.zeros_like(target_probs).detach()
+            ),
+            "trainable_reliability_used": torch.full(
+                (bsz,),
+                bool(trainable_reliability_used),
+                device=score_map.device,
+                dtype=torch.bool,
+            ),
             "effective_peak_count": effective_peak_count.detach(),
             "is_ambiguous": (
                 (ambiguity_ratio >= self.ratio_thresh) | (effective_peak_count >= 3)
