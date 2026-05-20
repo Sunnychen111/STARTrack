@@ -1,0 +1,1462 @@
+{
+  "success": [
+    "GOT-10k_Test_000057"
+  ],
+  "skipped": [
+    "GOT-10k_Test_000001",
+    "GOT-10k_Test_000002",
+    "GOT-10k_Test_000003",
+    "GOT-10k_Test_000004",
+    "GOT-10k_Test_000005",
+    "GOT-10k_Test_000006",
+    "GOT-10k_Test_000007",
+    "GOT-10k_Test_000008",
+    "GOT-10k_Test_000009",
+    "GOT-10k_Test_000010",
+    "GOT-10k_Test_000011",
+    "GOT-10k_Test_000012",
+    "GOT-10k_Test_000013",
+    "GOT-10k_Test_000014",
+    "GOT-10k_Test_000015",
+    "GOT-10k_Test_000016",
+    "GOT-10k_Test_000017",
+    "GOT-10k_Test_000018",
+    "GOT-10k_Test_000019",
+    "GOT-10k_Test_000020",
+    "GOT-10k_Test_000021",
+    "GOT-10k_Test_000022",
+    "GOT-10k_Test_000023",
+    "GOT-10k_Test_000024",
+    "GOT-10k_Test_000025",
+    "GOT-10k_Test_000026",
+    "GOT-10k_Test_000027",
+    "GOT-10k_Test_000028",
+    "GOT-10k_Test_000029",
+    "GOT-10k_Test_000030",
+    "GOT-10k_Test_000031",
+    "GOT-10k_Test_000032",
+    "GOT-10k_Test_000033",
+    "GOT-10k_Test_000034",
+    "GOT-10k_Test_000035",
+    "GOT-10k_Test_000036",
+    "GOT-10k_Test_000037",
+    "GOT-10k_Test_000038",
+    "GOT-10k_Test_000039",
+    "GOT-10k_Test_000040",
+    "GOT-10k_Test_000041",
+    "GOT-10k_Test_000042",
+    "GOT-10k_Test_000043",
+    "GOT-10k_Test_000044",
+    "GOT-10k_Test_000045",
+    "GOT-10k_Test_000046",
+    "GOT-10k_Test_000047",
+    "GOT-10k_Test_000048",
+    "GOT-10k_Test_000049",
+    "GOT-10k_Test_000050",
+    "GOT-10k_Test_000051",
+    "GOT-10k_Test_000052",
+    "GOT-10k_Test_000053",
+    "GOT-10k_Test_000054",
+    "GOT-10k_Test_000055",
+    "GOT-10k_Test_000056",
+    "GOT-10k_Test_000058",
+    "GOT-10k_Test_000059",
+    "GOT-10k_Test_000060",
+    "GOT-10k_Test_000061",
+    "GOT-10k_Test_000062",
+    "GOT-10k_Test_000063",
+    "GOT-10k_Test_000064",
+    "GOT-10k_Test_000065",
+    "GOT-10k_Test_000066",
+    "GOT-10k_Test_000067",
+    "GOT-10k_Test_000068",
+    "GOT-10k_Test_000069",
+    "GOT-10k_Test_000070",
+    "GOT-10k_Test_000071",
+    "GOT-10k_Test_000072",
+    "GOT-10k_Test_000073",
+    "GOT-10k_Test_000074",
+    "GOT-10k_Test_000075",
+    "GOT-10k_Test_000076",
+    "GOT-10k_Test_000077",
+    "GOT-10k_Test_000078",
+    "GOT-10k_Test_000079",
+    "GOT-10k_Test_000080",
+    "GOT-10k_Test_000081",
+    "GOT-10k_Test_000082",
+    "GOT-10k_Test_000083",
+    "GOT-10k_Test_000084",
+    "GOT-10k_Test_000085",
+    "GOT-10k_Test_000086",
+    "GOT-10k_Test_000087",
+    "GOT-10k_Test_000088",
+    "GOT-10k_Test_000089",
+    "GOT-10k_Test_000090",
+    "GOT-10k_Test_000091",
+    "GOT-10k_Test_000092",
+    "GOT-10k_Test_000093",
+    "GOT-10k_Test_000094",
+    "GOT-10k_Test_000095",
+    "GOT-10k_Test_000096",
+    "GOT-10k_Test_000097",
+    "GOT-10k_Test_000098",
+    "GOT-10k_Test_000099",
+    "GOT-10k_Test_000100",
+    "GOT-10k_Test_000101",
+    "GOT-10k_Test_000102",
+    "GOT-10k_Test_000103",
+    "GOT-10k_Test_000104",
+    "GOT-10k_Test_000105",
+    "GOT-10k_Test_000106",
+    "GOT-10k_Test_000107",
+    "GOT-10k_Test_000108",
+    "GOT-10k_Test_000109",
+    "GOT-10k_Test_000110",
+    "GOT-10k_Test_000111",
+    "GOT-10k_Test_000112",
+    "GOT-10k_Test_000113",
+    "GOT-10k_Test_000114",
+    "GOT-10k_Test_000115",
+    "GOT-10k_Test_000116",
+    "GOT-10k_Test_000117",
+    "GOT-10k_Test_000118",
+    "GOT-10k_Test_000119",
+    "GOT-10k_Test_000120",
+    "GOT-10k_Test_000121",
+    "GOT-10k_Test_000122",
+    "GOT-10k_Test_000123",
+    "GOT-10k_Test_000124",
+    "GOT-10k_Test_000125",
+    "GOT-10k_Test_000126",
+    "GOT-10k_Test_000127",
+    "GOT-10k_Test_000128",
+    "GOT-10k_Test_000129",
+    "GOT-10k_Test_000130",
+    "GOT-10k_Test_000131",
+    "GOT-10k_Test_000132",
+    "GOT-10k_Test_000133",
+    "GOT-10k_Test_000134",
+    "GOT-10k_Test_000135",
+    "GOT-10k_Test_000136",
+    "GOT-10k_Test_000137",
+    "GOT-10k_Test_000138",
+    "GOT-10k_Test_000139",
+    "GOT-10k_Test_000140",
+    "GOT-10k_Test_000141",
+    "GOT-10k_Test_000142",
+    "GOT-10k_Test_000143",
+    "GOT-10k_Test_000144",
+    "GOT-10k_Test_000145",
+    "GOT-10k_Test_000146",
+    "GOT-10k_Test_000147",
+    "GOT-10k_Test_000148",
+    "GOT-10k_Test_000149",
+    "GOT-10k_Test_000150",
+    "GOT-10k_Test_000151",
+    "GOT-10k_Test_000152",
+    "GOT-10k_Test_000153",
+    "GOT-10k_Test_000154",
+    "GOT-10k_Test_000155",
+    "GOT-10k_Test_000156",
+    "GOT-10k_Test_000157",
+    "GOT-10k_Test_000158",
+    "GOT-10k_Test_000159",
+    "GOT-10k_Test_000160",
+    "GOT-10k_Test_000161",
+    "GOT-10k_Test_000162",
+    "GOT-10k_Test_000163",
+    "GOT-10k_Test_000164",
+    "GOT-10k_Test_000165",
+    "GOT-10k_Test_000166",
+    "GOT-10k_Test_000167",
+    "GOT-10k_Test_000168",
+    "GOT-10k_Test_000169",
+    "GOT-10k_Test_000170",
+    "GOT-10k_Test_000171",
+    "GOT-10k_Test_000172",
+    "GOT-10k_Test_000173",
+    "GOT-10k_Test_000174",
+    "GOT-10k_Test_000175",
+    "GOT-10k_Test_000176",
+    "GOT-10k_Test_000177",
+    "GOT-10k_Test_000178",
+    "GOT-10k_Test_000179",
+    "GOT-10k_Test_000180"
+  ],
+  "failed": [],
+  "num_success": 1,
+  "num_skipped": 179,
+  "num_failed": 0,
+  "out_dir": "got10k_test_newstage4",
+  "official_tracking_results": "got10k_test_newstage4/tracking_results",
+  "tracker_name": "MPDTrack",
+  "result_param": "MPDtrack_5.18_v2",
+  "sequence_outputs": {
+    "GOT-10k_Test_000001": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000001.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000001_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000002": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000002.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000002_time.txt",
+      "frames": 80,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000003": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000003.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000003_time.txt",
+      "frames": 80,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000004": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000004.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000004_time.txt",
+      "frames": 71,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000005": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000005.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000005_time.txt",
+      "frames": 68,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000006": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000006.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000006_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000007": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000007.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000007_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000008": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000008.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000008_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000009": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000009.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000009_time.txt",
+      "frames": 97,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000010": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000010.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000010_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000011": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000011.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000011_time.txt",
+      "frames": 65,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000012": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000012.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000012_time.txt",
+      "frames": 80,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000013": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000013.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000013_time.txt",
+      "frames": 70,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000014": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000014.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000014_time.txt",
+      "frames": 80,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000015": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000015.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000015_time.txt",
+      "frames": 80,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000016": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000016.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000016_time.txt",
+      "frames": 70,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000017": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000017.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000017_time.txt",
+      "frames": 80,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000018": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000018.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000018_time.txt",
+      "frames": 90,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000019": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000019.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000019_time.txt",
+      "frames": 80,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000020": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000020.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000020_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000021": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000021.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000021_time.txt",
+      "frames": 65,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000022": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000022.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000022_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000023": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000023.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000023_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000024": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000024.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000024_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000025": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000025.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000025_time.txt",
+      "frames": 90,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000026": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000026.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000026_time.txt",
+      "frames": 90,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000027": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000027.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000027_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000028": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000028.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000028_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000029": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000029.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000029_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000030": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000030.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000030_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000031": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000031.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000031_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000032": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000032.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000032_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000033": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000033.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000033_time.txt",
+      "frames": 51,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000034": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000034.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000034_time.txt",
+      "frames": 70,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000035": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000035.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000035_time.txt",
+      "frames": 80,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000036": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000036.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000036_time.txt",
+      "frames": 90,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000037": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000037.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000037_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000038": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000038.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000038_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000039": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000039.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000039_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000040": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000040.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000040_time.txt",
+      "frames": 110,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000041": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000041.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000041_time.txt",
+      "frames": 90,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000042": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000042.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000042_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000043": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000043.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000043_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000044": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000044.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000044_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000045": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000045.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000045_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000046": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000046.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000046_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000047": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000047.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000047_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000048": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000048.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000048_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000049": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000049.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000049_time.txt",
+      "frames": 90,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000050": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000050.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000050_time.txt",
+      "frames": 80,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000051": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000051.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000051_time.txt",
+      "frames": 99,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000052": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000052.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000052_time.txt",
+      "frames": 70,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000053": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000053.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000053_time.txt",
+      "frames": 70,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000054": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000054.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000054_time.txt",
+      "frames": 80,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000055": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000055.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000055_time.txt",
+      "frames": 90,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000056": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000056.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000056_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000057": {
+      "status": "ran",
+      "legacy_pred": "got10k_test_newstage4/predictions/GOT-10k_Test_000057.txt",
+      "legacy_time": "got10k_test_newstage4/predictions/GOT-10k_Test_000057_time.txt",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000057.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000057_time.txt",
+      "peak_info": "got10k_test_newstage4/peak_info/GOT-10k_Test_000057_peak_info.csv",
+      "frames": 100,
+      "rerank_used_frames": 0,
+      "should_update_frames": 99,
+      "avg_time_per_frame": 0.03384772688150406,
+      "fps": 29.54408073425293
+    },
+    "GOT-10k_Test_000058": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000058.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000058_time.txt",
+      "frames": 90,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000059": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000059.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000059_time.txt",
+      "frames": 68,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000060": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000060.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000060_time.txt",
+      "frames": 120,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000061": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000061.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000061_time.txt",
+      "frames": 99,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000062": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000062.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000062_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000063": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000063.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000063_time.txt",
+      "frames": 88,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000064": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000064.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000064_time.txt",
+      "frames": 250,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000065": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000065.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000065_time.txt",
+      "frames": 91,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000066": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000066.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000066_time.txt",
+      "frames": 120,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000067": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000067.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000067_time.txt",
+      "frames": 91,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000068": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000068.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000068_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000069": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000069.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000069_time.txt",
+      "frames": 111,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000070": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000070.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000070_time.txt",
+      "frames": 161,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000071": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000071.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000071_time.txt",
+      "frames": 91,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000072": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000072.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000072_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000073": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000073.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000073_time.txt",
+      "frames": 91,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000074": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000074.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000074_time.txt",
+      "frames": 111,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000075": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000075.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000075_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000076": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000076.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000076_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000077": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000077.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000077_time.txt",
+      "frames": 130,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000078": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000078.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000078_time.txt",
+      "frames": 80,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000079": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000079.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000079_time.txt",
+      "frames": 140,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000080": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000080.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000080_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000081": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000081.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000081_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000082": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000082.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000082_time.txt",
+      "frames": 81,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000083": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000083.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000083_time.txt",
+      "frames": 81,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000084": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000084.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000084_time.txt",
+      "frames": 66,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000085": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000085.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000085_time.txt",
+      "frames": 210,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000086": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000086.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000086_time.txt",
+      "frames": 150,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000087": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000087.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000087_time.txt",
+      "frames": 96,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000088": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000088.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000088_time.txt",
+      "frames": 70,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000089": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000089.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000089_time.txt",
+      "frames": 130,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000090": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000090.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000090_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000091": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000091.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000091_time.txt",
+      "frames": 280,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000092": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000092.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000092_time.txt",
+      "frames": 920,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000093": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000093.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000093_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000094": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000094.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000094_time.txt",
+      "frames": 81,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000095": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000095.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000095_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000096": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000096.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000096_time.txt",
+      "frames": 99,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000097": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000097.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000097_time.txt",
+      "frames": 83,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000098": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000098.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000098_time.txt",
+      "frames": 81,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000099": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000099.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000099_time.txt",
+      "frames": 91,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000100": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000100.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000100_time.txt",
+      "frames": 90,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000101": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000101.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000101_time.txt",
+      "frames": 90,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000102": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000102.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000102_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000103": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000103.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000103_time.txt",
+      "frames": 71,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000104": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000104.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000104_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000105": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000105.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000105_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000106": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000106.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000106_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000107": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000107.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000107_time.txt",
+      "frames": 78,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000108": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000108.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000108_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000109": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000109.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000109_time.txt",
+      "frames": 71,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000110": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000110.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000110_time.txt",
+      "frames": 70,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000111": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000111.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000111_time.txt",
+      "frames": 310,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000112": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000112.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000112_time.txt",
+      "frames": 97,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000113": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000113.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000113_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000114": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000114.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000114_time.txt",
+      "frames": 110,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000115": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000115.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000115_time.txt",
+      "frames": 140,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000116": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000116.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000116_time.txt",
+      "frames": 160,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000117": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000117.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000117_time.txt",
+      "frames": 350,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000118": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000118.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000118_time.txt",
+      "frames": 71,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000119": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000119.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000119_time.txt",
+      "frames": 71,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000120": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000120.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000120_time.txt",
+      "frames": 200,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000121": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000121.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000121_time.txt",
+      "frames": 190,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000122": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000122.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000122_time.txt",
+      "frames": 100,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000123": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000123.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000123_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000124": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000124.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000124_time.txt",
+      "frames": 81,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000125": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000125.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000125_time.txt",
+      "frames": 71,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000126": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000126.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000126_time.txt",
+      "frames": 81,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000127": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000127.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000127_time.txt",
+      "frames": 71,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000128": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000128.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000128_time.txt",
+      "frames": 81,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000129": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000129.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000129_time.txt",
+      "frames": 121,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000130": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000130.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000130_time.txt",
+      "frames": 121,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000131": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000131.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000131_time.txt",
+      "frames": 111,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000132": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000132.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000132_time.txt",
+      "frames": 81,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000133": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000133.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000133_time.txt",
+      "frames": 291,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000134": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000134.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000134_time.txt",
+      "frames": 311,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000135": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000135.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000135_time.txt",
+      "frames": 151,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000136": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000136.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000136_time.txt",
+      "frames": 175,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000137": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000137.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000137_time.txt",
+      "frames": 350,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000138": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000138.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000138_time.txt",
+      "frames": 220,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000139": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000139.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000139_time.txt",
+      "frames": 151,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000140": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000140.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000140_time.txt",
+      "frames": 141,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000141": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000141.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000141_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000142": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000142.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000142_time.txt",
+      "frames": 220,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000143": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000143.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000143_time.txt",
+      "frames": 81,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000144": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000144.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000144_time.txt",
+      "frames": 301,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000145": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000145.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000145_time.txt",
+      "frames": 241,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000146": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000146.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000146_time.txt",
+      "frames": 131,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000147": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000147.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000147_time.txt",
+      "frames": 171,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000148": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000148.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000148_time.txt",
+      "frames": 116,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000149": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000149.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000149_time.txt",
+      "frames": 181,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000150": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000150.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000150_time.txt",
+      "frames": 491,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000151": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000151.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000151_time.txt",
+      "frames": 251,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000152": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000152.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000152_time.txt",
+      "frames": 181,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000153": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000153.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000153_time.txt",
+      "frames": 91,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000154": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000154.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000154_time.txt",
+      "frames": 91,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000155": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000155.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000155_time.txt",
+      "frames": 311,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000156": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000156.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000156_time.txt",
+      "frames": 130,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000157": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000157.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000157_time.txt",
+      "frames": 241,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000158": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000158.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000158_time.txt",
+      "frames": 211,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000159": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000159.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000159_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000160": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000160.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000160_time.txt",
+      "frames": 361,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000161": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000161.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000161_time.txt",
+      "frames": 211,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000162": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000162.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000162_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000163": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000163.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000163_time.txt",
+      "frames": 131,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000164": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000164.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000164_time.txt",
+      "frames": 681,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000165": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000165.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000165_time.txt",
+      "frames": 201,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000166": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000166.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000166_time.txt",
+      "frames": 71,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000167": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000167.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000167_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000168": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000168.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000168_time.txt",
+      "frames": 81,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000169": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000169.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000169_time.txt",
+      "frames": 91,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000170": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000170.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000170_time.txt",
+      "frames": 91,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000171": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000171.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000171_time.txt",
+      "frames": 90,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000172": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000172.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000172_time.txt",
+      "frames": 81,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000173": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000173.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000173_time.txt",
+      "frames": 81,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000174": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000174.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000174_time.txt",
+      "frames": 89,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000175": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000175.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000175_time.txt",
+      "frames": 91,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000176": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000176.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000176_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000177": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000177.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000177_time.txt",
+      "frames": 101,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000178": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000178.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000178_time.txt",
+      "frames": 121,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000179": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000179.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000179_time.txt",
+      "frames": 91,
+      "skip_reason": "complete"
+    },
+    "GOT-10k_Test_000180": {
+      "status": "skipped_existing",
+      "official_bbox": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000180.txt",
+      "official_time": "got10k_test_newstage4/tracking_results/MPDTrack/MPDtrack_5.18_v2/GOT-10k_Test_000180_time.txt",
+      "frames": 80,
+      "skip_reason": "complete"
+    }
+  }
+}

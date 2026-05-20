@@ -1,0 +1,99 @@
+# stage4_got10k_decoder_ft_2ep.yaml
+# Decoder fine-tuning stage for checking SR0.75 improvement
+
+paths:
+  sutrack_ckpt: /home/cps/czl/STARTrack_v5/checkpoints/sutrack_b384/SUTRACK_ep0180.pth.tar
+
+  # 使用当前最好 Stage4 checkpoint 继续微调
+  # 如果你现在最好的是 best.pth，也可以改成 best.pth
+  reranker_ckpt: /home/cps/czl/STARTrack_v6/checkpoints/stage4_got10k_three_stage_b384_v2/last.pth
+
+  # 单独输出，不覆盖主结果
+  output_dir: /home/cps/czl/STARTrack_v6/checkpoints/stage4_got10k_decoder_defreeze_b384_v2
+
+  config: /home/cps/czl/STARTrack_v6/experiments/sutrack/sutrack_b384.yaml
+
+
+data:
+  dataset: got10k
+  use_lmdb: false
+
+  stage4_sampling_mode: hard_frame_mixed
+
+  # 保持和你当前 GOT-10k 训练一致
+  hard_frame_list: /home/cps/czl/STARTrack_v5/stage4_hard_frames/got10k_hard_frame_anchor_list.txt
+
+  hard_seq_list: null
+
+  hard_frame_ratio: 0.6
+  hard_seq_ratio: 0.2
+  full_ratio: 0.2
+
+  anchor_jitter: -1
+  min_anchor_valid_frames: 1
+  max_anchor_retry: 20
+
+
+training:
+  # Decoder 微调只跑短阶段
+  epochs: 2
+  samples_per_epoch: 1000
+
+  rollout_len: 8
+  topk: 8
+  batch_size: 1
+  num_workers: 4
+  device: cuda
+  seed: 42
+
+  # encoder 继续冻结
+  freeze_encoder: true
+
+  # 关键：解冻 decoder
+  unfreeze_decoder: true
+
+  history_len: 32
+  detach_history: true
+
+  update_mode: auto
+
+  # 2 epoch 下，建议全程 coach 更稳；
+  # 如果你的代码 auto 会强制切阶段，可以保留 coach_epochs: 2
+  coach_epochs: 2
+  scheduled_takeover_epochs: 0
+
+  teacher_prob_start: 0.8
+  teacher_prob_end: 0.2
+  teacher_decay_epochs: 4
+
+  takeover_prob_thresh: 0.35
+  safe_pred_prob_thresh: 0.45
+
+  max_motion_norm: 4.0
+  max_scale_ratio: 4.0
+
+
+loss:
+  iou_thresh: 0.3
+
+  # 保持当前最好 GOT-10k 设置，不要同时改太多变量
+  apply_gain_thr: 0.10
+  best_iou_thr: 0.50
+  apply_threshold: 0.50
+
+  rank_lambda: 0.05
+  margin: 0.2
+
+
+optimizer:
+  # decoder 微调阶段学习率要小
+  lr_reranker: 0.000005
+  lr_decoder: 0.0000005
+
+  weight_decay: 0.0001
+  grad_clip_norm: 1.0
+
+
+logging:
+  save_every: 1
+  print_every: 2

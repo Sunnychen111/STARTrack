@@ -1,0 +1,16 @@
+# 强正例：不能被挡
+  swing-20
+  bottle-12
+  coin-10
+  sheep-5
+
+# 强反例：必须压住
+  basketball-5
+  monkey-20
+
+# 边界样本：观察收紧阈值是否变稳
+ # umbrella-13
+ basketball-9
+ basketball-18
+ microphone-13
+ spider-14

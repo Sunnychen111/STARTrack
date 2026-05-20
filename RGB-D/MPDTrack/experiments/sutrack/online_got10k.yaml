@@ -1,0 +1,86 @@
+# stage4_got10k_three_stage.yaml
+
+paths:
+  sutrack_ckpt: /home/cps/czl/STARTrack_v5/checkpoints/sutrack_b384/SUTRACK_ep0180.pth.tar
+
+  # 这里可以用 LaSOT 训练好的 Stage3/Stage4 checkpoint 继续迁移，
+  # 也可以换成 GOT-10k 自己 Stage3 的 checkpoint
+  reranker_ckpt: /home/cps/czl/STARTrack_v6/checkpoints/stage4_lasot_three_stage_b384_center/last.pth
+  output_dir: /home/cps/czl/STARTrack_v6/checkpoints/stage4_got10k_three_stage_b384_center
+
+  config: /home/cps/czl/STARTrack_v6/experiments/sutrack/sutrack_b384.yaml
+
+
+data:
+  dataset: got10k
+  use_lmdb: false
+
+  stage4_sampling_mode: hard_frame_mixed
+
+  # GOT-10k hard-frame txt
+  hard_frame_list: /home/cps/czl/STARTrack_v6/stage4_hard_frames_gain_all/got10k_hard_frame_anchor_list.txt
+
+  # 如果没有 hard sequence txt，可以设为 null
+  hard_seq_list: null
+
+  hard_frame_ratio: 0.7
+  hard_seq_ratio: 0.1
+  full_ratio: 0.2
+
+  anchor_jitter: -1
+  min_anchor_valid_frames: 1
+  max_anchor_retry: 20
+
+
+training:
+  epochs: 10
+  samples_per_epoch: 3000
+  rollout_len: 8
+  topk: 8
+  batch_size: 1
+  num_workers: 4
+  device: cuda
+  seed: 42
+
+  freeze_encoder: true
+  unfreeze_decoder: false
+
+  history_len: 32
+  detach_history: true
+
+  update_mode: auto
+
+  coach_epochs: 3
+  scheduled_takeover_epochs: 4
+
+  teacher_prob_start: 0.8
+  teacher_prob_end: 0.2
+  teacher_decay_epochs: 4
+
+  takeover_prob_thresh: 0.35
+  safe_pred_prob_thresh: 0.45
+
+  max_motion_norm: 4.0
+  max_scale_ratio: 4.0
+
+
+loss:
+  iou_thresh: 0.3
+  apply_gain_thr: 0.10
+  best_iou_thr: 0.50
+  apply_threshold: 0.50
+
+  rank_lambda: 0.05
+  margin: 0.2
+
+
+optimizer:
+  lr_reranker: 0.00001
+  lr_decoder: 0.000001
+  weight_decay: 0.0001
+  grad_clip_norm: 1.0
+
+
+logging:
+  save_every: 2
+  print_every: 20

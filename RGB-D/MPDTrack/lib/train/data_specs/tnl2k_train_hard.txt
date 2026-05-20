@@ -1,0 +1,5 @@
+# Hard subset for TNL2K train.
+# One sequence per line. Accepts either:
+# 1) sequence folder name
+# 2) integer index in TNL2K sequence_list
+0
